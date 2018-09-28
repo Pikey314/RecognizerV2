@@ -21,7 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".SelectSourceForRecognitionActivity" />
-        <activity android:name=".ConfirmRecognitionSelectionActivity"></activity>
+        <activity android:name=".ConfirmRecognitionSelectionActivity" />
+        <activity android:name=".RecognizeOnLiveVideoActivity"></activity>
     </application>
 
 </manifest>

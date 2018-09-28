@@ -57,7 +57,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
                 case "Gallery":
                     if (videOrPhoto.equals("Video")) {
                         this.selectResourceButton.setBackgroundResource(R.drawable.video_gallery_icon);
-                        this.selection = "GalleryPhoto";
+                        this.selection = "GalleryVideo";
 
                     } else {
                         this.selectResourceButton.setBackgroundResource(R.drawable.photo_gallery_icon);
@@ -78,6 +78,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
             switch (this.selection) {
                 case "LiveVideo":
                     Log.v("Button Selection", "LiveVideo");
+                    recognizeOnLiveVideoActivity();
                     break;
                 case "LivePhoto":
                     Log.v("Button Selection", "LivePhoto");
@@ -101,6 +102,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         startActivityForResult(galleryIntent, SELECTED_PICTURE);
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -113,5 +115,10 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
             ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
             this.resourceForRecognitionImageView.setColorFilter(filter);
         }
+    }
+
+    public void recognizeOnLiveVideoActivity() {
+        Intent recognizeWithVideoIntent = new Intent(this, RecognizeOnLiveVideoActivity.class);
+        startActivity(recognizeWithVideoIntent);
     }
 }
