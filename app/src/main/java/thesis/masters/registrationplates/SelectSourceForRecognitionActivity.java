@@ -45,8 +45,18 @@ public class SelectSourceForRecognitionActivity extends AppCompatActivity {
 
     }
 
+    public void goToColorDetectionActivity(View view){
+        Intent intent = new Intent(this,DetectColorsActivity.class);
+        startActivity(intent);
+    }
+
     private String getRadioButtonValue(RadioGroup radioGroup){
         String radioButtonTextValue = ((RadioButton) findViewById( radioGroup.getCheckedRadioButtonId())).getText().toString();
         return radioButtonTextValue;
+    }
+
+    public void goToOcrOnlyActivity(View view){
+        Intent intent = new Intent(this,OcrOnlyActivity.class);
+        startActivity(intent);
     }
 }

@@ -2,19 +2,10 @@ package thesis.masters.registrationplates;
 
 import android.Manifest;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,9 +18,13 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
     private TextView confirmationOfSelectionTextView;
     private Button selectResourceButton;
     private String selection = null;
-    private ImageView resourceForRecognitionImageView;
+
+
+    /*private ImageView resourceForRecognitionImageView;
     private static final int SELECTED_PICTURE = 1;
     private String[] galleryPermissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+*/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +32,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_confirm_recognition_selection);
         this.confirmationOfSelectionTextView = (TextView) findViewById(R.id.confirmationOfRecognitionSelectionTextView);
         this.selectResourceButton = (Button) findViewById(R.id.selectResourceButton);
-        this.resourceForRecognitionImageView = (ImageView) findViewById(R.id.resourceForRecognitionImageView);
+        //this.resourceForRecognitionImageView = (ImageView) findViewById(R.id.resourceForRecognitionImageView);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String liveOrGallery = extras.getString("liveOrGallerySelectionText");
@@ -85,7 +80,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
                     break;
                 case "GalleryPhoto":
                     Log.v("Button Selection", "GalleryPhoto");
-                    chooseImageFromGallery();
+                    recognizeOnGalleryImageActivity();
                     break;
                 case "GalleryVideo":
                     Log.v("Button Selection", "GalleryVideo");
@@ -97,7 +92,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         }
     }
 
-    public void chooseImageFromGallery() {
+    /*public void chooseImageFromGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(galleryIntent, SELECTED_PICTURE);
     }
@@ -115,10 +110,15 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
             ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
             this.resourceForRecognitionImageView.setColorFilter(filter);
         }
-    }
+    }*/
 
     public void recognizeOnLiveVideoActivity() {
-        Intent recognizeWithVideoIntent = new Intent(this, RecognizeOnLiveVideoActivity.class);
-        startActivity(recognizeWithVideoIntent);
+        Intent recognizeOnLiveVideoIntent = new Intent(this, RecognizeOnLiveVideoActivity.class);
+        startActivity(recognizeOnLiveVideoIntent);
+    }
+
+    public void recognizeOnGalleryImageActivity() {
+        Intent recognizeOnGalleryImageIntent = new Intent(this, RecognizeOnGalleryImageActivity.class);
+        startActivity(recognizeOnGalleryImageIntent);
     }
 }

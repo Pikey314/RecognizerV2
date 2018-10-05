@@ -36,7 +36,7 @@
     <Button
         android:id="@+id/startRecognitionButton"
         android:layout_width="match_parent"
-        android:layout_height="23dp"
+        android:layout_height="40dp"
         android:background="@android:color/holo_blue_light"
         android:text="@string/startRecognitionText"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -139,5 +139,29 @@
             android:paddingRight="20dp"
             android:text="@string/radioButtonPhoto" />
     </RadioGroup>
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/buttonColorDetect"
+        android:onClick="goToColorDetectionActivity"
+        android:background="@android:color/holo_red_light"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/startRecognitionButton"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="422dp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OCR"
+        android:onClick="goToOcrOnlyActivity"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/button3"
+        android:background="@android:color/holo_red_light"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="374dp" />
 
 </android.support.constraint.ConstraintLayout>

@@ -11,6 +11,8 @@
     <string name="radioButtonGallery">Gallery</string>
     <string name="radioButtonPhoto">Photo</string>
     <string name="radioButtonVideo">Video</string>
+    <string name="buttonPickImageFromGallery">Pick Image</string>
+    <string name="buttonColorDetect">Detect color</string>
     <string-array name="recognitionMethodsArray">
         <item>Signature Analysis</item>
         <item>Cascade Classifier</item>
