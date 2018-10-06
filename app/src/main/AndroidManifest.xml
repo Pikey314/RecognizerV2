@@ -25,10 +25,15 @@
         <activity android:name=".RecognizeOnLiveVideoActivity" />
         <activity android:name=".RecognizeOnGalleryImageActivity" />
         <activity android:name=".DetectColorsActivity" />
-        <activity android:name=".OcrOnlyActivity"></activity>
+        <activity android:name=".OcrOnlyActivity" />
 
-        <meta-data android:name="com.google.android.gms.vision.DEPENDENCIES"
-            android:value="ocr"/>
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="ocr" />
+
+        <activity android:name=".RecognizeOnPreRecordedVideoActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

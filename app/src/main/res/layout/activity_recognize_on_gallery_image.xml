@@ -23,8 +23,9 @@
     <ImageView
         android:id="@+id/imageToBeRecognizedImageView"
         android:layout_width="match_parent"
-        android:layout_height="467dp"
+        android:layout_height="512dp"
         android:layout_alignParentTop="true"
+        android:layout_marginTop="9dp"
         tools:srcCompat="@tools:sample/avatars" />
 
     <Button

@@ -4,12 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RecognizeOnLiveVideoActivity">
+    tools:context=".RecognizeOnPreRecordedVideoActivity">
 
     <org.opencv.android.JavaCameraView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/rearCameraView"
+        android:id="@+id/preRecordedVideoCameraView"
         app:show_fps="true"/>
+
+    <Button
+        android:id="@+id/getVideoFromGalleryButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        android:onClick="pickVideoFromGallery"
+        android:rotation="90"
+        android:text="Button" />
 
 </RelativeLayout>

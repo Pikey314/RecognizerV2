@@ -1,5 +1,6 @@
 package thesis.masters.registrationplates;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,7 +39,6 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         this.cameraBridgeViewBase = (JavaCameraView) findViewById(R.id.rearCameraView);
         cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
         cameraBridgeViewBase.setCvCameraViewListener(this);
-
         this.baseLoaderCallback = new BaseLoaderCallback(this) {
             @Override
             public void onManagerConnected(int status) {
@@ -134,9 +134,12 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
 
 
         //frame rotation
-        Core.transpose(mat1,mat5);
-        Imgproc.resize(mat5,mat6,mat6.size(),0,0,0);
-        Core.flip(mat6,mat1,1);
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Core.transpose(mat1,mat5);
+            Imgproc.resize(mat5,mat6,mat6.size(),0,0,0);
+            Core.flip(mat6,mat1,1);
+        }
         return mat1;
     }
 
@@ -164,7 +167,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         super.onPause();
         if(cameraBridgeViewBase!=null)
         {
-            cameraBridgeViewBase.disableView();
+            //cameraBridgeViewBase.disableView();
         }
     }
 

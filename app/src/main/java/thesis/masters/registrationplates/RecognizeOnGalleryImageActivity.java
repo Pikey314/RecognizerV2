@@ -168,6 +168,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -189,6 +190,8 @@ import java.util.ListIterator;
 
 public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
     private static final int SELECTED_PICTURE = 101;
+    private static final int MAX_ALLOWED_BITMAP_HEIGHT = 4096;
+    private static final int MAX_ALLOWED_BITMAP_WIDTH = 4096;
     ImageView imageView;
     Uri imageURI;
     Bitmap imageBitmap, grayBitmap;
@@ -215,6 +218,30 @@ public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
 
             try {
                 imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageURI);
+                if (imageBitmap.getHeight()>MAX_ALLOWED_BITMAP_HEIGHT || imageBitmap.getWidth()>MAX_ALLOWED_BITMAP_WIDTH) {
+                    Bitmap tmpBitmap;
+                    int oversizeWidth = imageBitmap.getWidth() - MAX_ALLOWED_BITMAP_WIDTH;
+                    int oversizeHeight = imageBitmap.getHeight() - MAX_ALLOWED_BITMAP_HEIGHT;
+                    int areaToCutWidth = oversizeWidth / 2;
+                    int areaToCutHeight = oversizeHeight / 2;
+
+                    if (imageBitmap.getHeight() > MAX_ALLOWED_BITMAP_HEIGHT && imageBitmap.getWidth() <= MAX_ALLOWED_BITMAP_WIDTH) {
+                        areaToCutHeight += 1;
+                        areaToCutWidth = 0;
+                        oversizeWidth = 0;
+                    }
+                    else if (imageBitmap.getHeight() <= MAX_ALLOWED_BITMAP_HEIGHT && imageBitmap.getWidth() > MAX_ALLOWED_BITMAP_WIDTH) {
+                        areaToCutWidth += 1;
+                        areaToCutHeight = 0;
+                        oversizeHeight = 0;
+                    }
+                    else {
+                        areaToCutWidth += 1;
+                        areaToCutHeight += 1;
+                    }
+                    tmpBitmap = Bitmap.createBitmap(imageBitmap,areaToCutWidth,areaToCutHeight,imageBitmap.getWidth()-oversizeWidth,imageBitmap.getHeight()-oversizeHeight);
+                    imageBitmap = tmpBitmap;
+                }
                 this.imageView.setImageBitmap(imageBitmap);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -300,7 +327,7 @@ public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
 
         Utils.matToBitmap(imageMat1,grayBitmap);
 
-        imageView.setImageBitmap(grayBitmap);
+       imageView.setImageBitmap(grayBitmap);
 
     }
 }
@@ -334,3 +361,30 @@ public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
     }
 }*/
 
+/*if (imageBitmap.getHeight()>4096 || imageBitmap.getWidth()>4096)
+ *//* {
+                    DisplayMetrics metrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                    int metricsWidth = metrics.widthPixels;
+                    int metricsHeight = metrics.heightPixels;
+                    double maxDiff;
+                    double difference;
+                    if (metricsHeight >= metricsWidth) {
+                        maxDiff = (double) metricsHeight / (double) metricsWidth;
+                        if (imageBitmap.getHeight() == imageBitmap.getWidth()) {
+                            imageBitmap = Bitmap.createScaledBitmap(imageBitmap, metricsWidth, metricsWidth, true);
+                        } else if (imageBitmap.getHeight() > imageBitmap.getWidth()) {
+                            difference = (double) imageBitmap.getHeight() / (double) imageBitmap.getWidth();
+                            if (difference > maxDiff)
+                                difference = maxDiff;
+                            int diffMetricsHeight = (int) (metricsWidth * difference);
+                            imageBitmap = Bitmap.createScaledBitmap(imageBitmap, metricsWidth, diffMetricsHeight, true);
+                        } else {
+                            difference = (double) imageBitmap.getWidth() / (double) imageBitmap.getHeight();
+                            int diffMetricsHeight = (int) (metricsHeight / difference);
+                            imageBitmap = Bitmap.createScaledBitmap(imageBitmap, metricsWidth, diffMetricsHeight, true);
+                        }
+                    }
+
+
+                }*/
