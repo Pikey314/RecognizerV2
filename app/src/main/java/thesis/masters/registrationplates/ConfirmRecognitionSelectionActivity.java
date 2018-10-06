@@ -84,6 +84,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
                     break;
                 case "GalleryVideo":
                     Log.v("Button Selection", "GalleryVideo");
+                    recognizeOnPreRecordedVideoActivity();
                     break;
                 default:
                     Log.v("Problem with code", "Push button problem");
@@ -120,5 +121,10 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
     public void recognizeOnGalleryImageActivity() {
         Intent recognizeOnGalleryImageIntent = new Intent(this, RecognizeOnGalleryImageActivity.class);
         startActivity(recognizeOnGalleryImageIntent);
+    }
+
+    public void recognizeOnPreRecordedVideoActivity() {
+        Intent recognizeOnPreRecordedVideoIntent = new Intent(this, RecognizeOnPreRecordedVideoActivity.class);
+        startActivity(recognizeOnPreRecordedVideoIntent);
     }
 }
