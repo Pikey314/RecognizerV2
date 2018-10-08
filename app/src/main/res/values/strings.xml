@@ -12,6 +12,7 @@
     <string name="radioButtonPhoto">Photo</string>
     <string name="radioButtonVideo">Video</string>
     <string name="buttonPickImageFromGallery">Pick Image</string>
+    <string name="buttonTakeAPhoto">Take a photo</string>
     <string name="buttonColorDetect">Detect color</string>
     <string-array name="recognitionMethodsArray">
         <item>Signature Analysis</item>

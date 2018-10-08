@@ -18,6 +18,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
     private TextView confirmationOfSelectionTextView;
     private Button selectResourceButton;
     private String selection = null;
+    String liveOrGallery;
 
 
     /*private ImageView resourceForRecognitionImageView;
@@ -35,7 +36,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         //this.resourceForRecognitionImageView = (ImageView) findViewById(R.id.resourceForRecognitionImageView);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String liveOrGallery = extras.getString("liveOrGallerySelectionText");
+            liveOrGallery = extras.getString("liveOrGallerySelectionText");
             String videOrPhoto = extras.getString("videoOrPhotoSelectionText");
             String recognitionMethod = extras.getString("spinnerValue");
             this.confirmationOfSelectionTextView.setText(liveOrGallery + videOrPhoto + recognitionMethod);
@@ -46,7 +47,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
                         this.selection = "LiveVideo";
                     } else {
                         this.selectResourceButton.setBackgroundResource(R.drawable.photo_live_icon);
-                        this.selection = "LivePhoto";
+                        this.selection = "Image";
                     }
                     break;
                 case "Gallery":
@@ -56,7 +57,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
 
                     } else {
                         this.selectResourceButton.setBackgroundResource(R.drawable.photo_gallery_icon);
-                        this.selection = "GalleryPhoto";
+                        this.selection = "Image";
 
                     }
                     break;
@@ -75,12 +76,9 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
                     Log.v("Button Selection", "LiveVideo");
                     recognizeOnLiveVideoActivity();
                     break;
-                case "LivePhoto":
-                    Log.v("Button Selection", "LivePhoto");
-                    break;
-                case "GalleryPhoto":
+                case "Image":
                     Log.v("Button Selection", "GalleryPhoto");
-                    recognizeOnGalleryImageActivity();
+                    recognizeOnImageActivity();
                     break;
                 case "GalleryVideo":
                     Log.v("Button Selection", "GalleryVideo");
@@ -118,9 +116,10 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         startActivity(recognizeOnLiveVideoIntent);
     }
 
-    public void recognizeOnGalleryImageActivity() {
-        Intent recognizeOnGalleryImageIntent = new Intent(this, RecognizeOnGalleryImageActivity.class);
-        startActivity(recognizeOnGalleryImageIntent);
+    public void recognizeOnImageActivity() {
+        Intent recognizeOnImageIntent = new Intent(this, RecognizeOnImageActivity.class);
+        recognizeOnImageIntent.putExtra("liveGallerySelection",liveOrGallery);
+        startActivity(recognizeOnImageIntent);
     }
 
     public void recognizeOnPreRecordedVideoActivity() {

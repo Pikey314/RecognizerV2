@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RecognizeOnGalleryImageActivity">
+    tools:context=".RecognizeOnImageActivity">
 
 
     <Button
-        android:id="@+id/pickImageFromGalleryButton"
+        android:id="@+id/pickImageButton"
         android:layout_width="206dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -17,8 +17,7 @@
         android:layout_marginEnd="178dp"
         android:layout_marginRight="178dp"
         android:layout_marginBottom="0dp"
-        android:onClick="pickImageFromGallery"
-        android:text="@string/buttonPickImageFromGallery" />
+        android:onClick="pickImageFromGallery" />
 
     <ImageView
         android:id="@+id/imageToBeRecognizedImageView"

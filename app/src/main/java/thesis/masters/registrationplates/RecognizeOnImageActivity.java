@@ -26,7 +26,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
 
-public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
+public class RecognizeOnImageActivity extends AppCompatActivity {
 
     ImageView imageToBeRecognized;
     private static final int SELECTED_PICTURE = 101;
@@ -35,7 +35,7 @@ public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recognize_on_gallery_image);
+        setContentView(R.layout.activity_recognize_on_image);
         //OpenCVLoader.initDebug();
         this.imageToBeRecognized = (ImageView) findViewById(R.id.imageToBeRecognizedImageView);
 
@@ -160,16 +160,18 @@ public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
 
 
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import org.opencv.android.OpenCVLoader;
@@ -184,71 +186,157 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.ListIterator;
 
-public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
-    private static final int SELECTED_PICTURE = 101;
+public class RecognizeOnImageActivity extends AppCompatActivity {
+    private static final int GALLERY_PICTURE = 101;
+    private static final int CAMERA_PHOTO = 202;
     private static final int MAX_ALLOWED_BITMAP_HEIGHT = 4096;
     private static final int MAX_ALLOWED_BITMAP_WIDTH = 4096;
     ImageView imageView;
     Uri imageURI;
+    Uri photoURI;
     Bitmap imageBitmap, grayBitmap;
+    String liveGallerySelection;
+    String mCurrentPhotoPath;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recognize_on_gallery_image);
+        setContentView(R.layout.activity_recognize_on_image);
         this.imageView = (ImageView) findViewById(R.id.imageToBeRecognizedImageView);
         OpenCVLoader.initDebug();
+        Bundle extras = getIntent().getExtras();
+        if (extras != null)
+            this.liveGallerySelection = extras.getString("liveGallerySelection");
+        else
+            this.liveGallerySelection = "Gallery";
+        Button pickImageButton = findViewById(R.id.pickImageButton);
+        if (this.liveGallerySelection.equals("Live"))
+            pickImageButton.setText(R.string.buttonTakeAPhoto);
+        else
+            pickImageButton.setText(R.string.buttonPickImageFromGallery);
+
     }
 
     public void pickImageFromGallery(View view) {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(galleryIntent, SELECTED_PICTURE);
+        switch (this.liveGallerySelection) {
+            case "Gallery":
+                Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(galleryIntent, GALLERY_PICTURE);
+                break;
+            case "Live":
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                photoURI = getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
+
+                startActivityForResult(cameraIntent, CAMERA_PHOTO);
+
+
+                /*File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+                }
+                if (photoFile != null) {
+                    Uri photoURI = FileProvider.getUriForFile(this,
+                            "thesis.masters.registrationplates",
+                            photoFile);
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
+
+                    startActivityForResult(cameraIntent, CAMERA_PHOTO);
+                }*/
+                break;
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (data != null && resultCode == RESULT_OK && requestCode == SELECTED_PICTURE) {
+        if (data != null && resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
             this.imageURI = data.getData();
 
             try {
                 imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageURI);
-                if (imageBitmap.getHeight()>MAX_ALLOWED_BITMAP_HEIGHT || imageBitmap.getWidth()>MAX_ALLOWED_BITMAP_WIDTH) {
-                    Bitmap tmpBitmap;
-                    int oversizeWidth = imageBitmap.getWidth() - MAX_ALLOWED_BITMAP_WIDTH;
-                    int oversizeHeight = imageBitmap.getHeight() - MAX_ALLOWED_BITMAP_HEIGHT;
-                    int areaToCutWidth = oversizeWidth / 2;
-                    int areaToCutHeight = oversizeHeight / 2;
+                if (imageBitmap.getHeight()>MAX_ALLOWED_BITMAP_HEIGHT || imageBitmap.getWidth()>MAX_ALLOWED_BITMAP_WIDTH)
+                    imageBitmap = adjustBitmap(imageBitmap);
 
-                    if (imageBitmap.getHeight() > MAX_ALLOWED_BITMAP_HEIGHT && imageBitmap.getWidth() <= MAX_ALLOWED_BITMAP_WIDTH) {
-                        areaToCutHeight += 1;
-                        areaToCutWidth = 0;
-                        oversizeWidth = 0;
-                    }
-                    else if (imageBitmap.getHeight() <= MAX_ALLOWED_BITMAP_HEIGHT && imageBitmap.getWidth() > MAX_ALLOWED_BITMAP_WIDTH) {
-                        areaToCutWidth += 1;
-                        areaToCutHeight = 0;
-                        oversizeHeight = 0;
-                    }
-                    else {
-                        areaToCutWidth += 1;
-                        areaToCutHeight += 1;
-                    }
-                    tmpBitmap = Bitmap.createBitmap(imageBitmap,areaToCutWidth,areaToCutHeight,imageBitmap.getWidth()-oversizeWidth,imageBitmap.getHeight()-oversizeHeight);
-                    imageBitmap = tmpBitmap;
-                }
                 this.imageView.setImageBitmap(imageBitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
 
+        } else if (resultCode == RESULT_OK && requestCode == CAMERA_PHOTO) {
+            try {
+                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
+                if (imageBitmap.getHeight()>MAX_ALLOWED_BITMAP_HEIGHT || imageBitmap.getWidth()>MAX_ALLOWED_BITMAP_WIDTH)
+                    imageBitmap = adjustBitmap(imageBitmap);
+
+                this.imageView.setImageBitmap(imageBitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+
+
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private Bitmap adjustBitmap(Bitmap bitmap){
+
+            Bitmap tmpBitmap;
+            int oversizeWidth = bitmap.getWidth() - MAX_ALLOWED_BITMAP_WIDTH;
+            int oversizeHeight = bitmap.getHeight() - MAX_ALLOWED_BITMAP_HEIGHT;
+            int areaToCutWidth = oversizeWidth / 2;
+            int areaToCutHeight = oversizeHeight / 2;
+
+            if (bitmap.getHeight() > MAX_ALLOWED_BITMAP_HEIGHT && bitmap.getWidth() <= MAX_ALLOWED_BITMAP_WIDTH) {
+                areaToCutHeight += 1;
+                areaToCutWidth = 0;
+                oversizeWidth = 0;
+            }
+            else if (bitmap.getHeight() <= MAX_ALLOWED_BITMAP_HEIGHT && bitmap.getWidth() > MAX_ALLOWED_BITMAP_WIDTH) {
+                areaToCutWidth += 1;
+                areaToCutHeight = 0;
+                oversizeHeight = 0;
+            }
+            else {
+                areaToCutWidth += 1;
+                areaToCutHeight += 1;
+            }
+            tmpBitmap = Bitmap.createBitmap(bitmap,areaToCutWidth,areaToCutHeight,bitmap.getWidth()-oversizeWidth,bitmap.getHeight()-oversizeHeight);
+            return tmpBitmap;
+
     }
 
     public void recognizeTestMethod1(View view) {
@@ -388,3 +476,28 @@ public class RecognizeOnGalleryImageActivity extends AppCompatActivity {
 
 
                 }*/
+
+
+
+/*Bitmap tmpBitmap;
+                    int oversizeWidth = imageBitmap.getWidth() - MAX_ALLOWED_BITMAP_WIDTH;
+                    int oversizeHeight = imageBitmap.getHeight() - MAX_ALLOWED_BITMAP_HEIGHT;
+                    int areaToCutWidth = oversizeWidth / 2;
+                    int areaToCutHeight = oversizeHeight / 2;
+
+                    if (imageBitmap.getHeight() > MAX_ALLOWED_BITMAP_HEIGHT && imageBitmap.getWidth() <= MAX_ALLOWED_BITMAP_WIDTH) {
+                        areaToCutHeight += 1;
+                        areaToCutWidth = 0;
+                        oversizeWidth = 0;
+                    }
+                    else if (imageBitmap.getHeight() <= MAX_ALLOWED_BITMAP_HEIGHT && imageBitmap.getWidth() > MAX_ALLOWED_BITMAP_WIDTH) {
+                        areaToCutWidth += 1;
+                        areaToCutHeight = 0;
+                        oversizeHeight = 0;
+                    }
+                    else {
+                        areaToCutWidth += 1;
+                        areaToCutHeight += 1;
+                    }
+                    tmpBitmap = Bitmap.createBitmap(imageBitmap,areaToCutWidth,areaToCutHeight,imageBitmap.getWidth()-oversizeWidth,imageBitmap.getHeight()-oversizeHeight);
+                    imageBitmap = tmpBitmap;*/

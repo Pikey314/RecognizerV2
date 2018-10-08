@@ -23,7 +23,7 @@
         <activity android:name=".SelectSourceForRecognitionActivity" />
         <activity android:name=".ConfirmRecognitionSelectionActivity" />
         <activity android:name=".RecognizeOnLiveVideoActivity" />
-        <activity android:name=".RecognizeOnGalleryImageActivity" />
+        <activity android:name=".RecognizeOnImageActivity" />
         <activity android:name=".DetectColorsActivity" />
         <activity android:name=".OcrOnlyActivity" />
 
@@ -34,6 +34,16 @@
         <activity android:name=".RecognizeOnPreRecordedVideoActivity"
             android:screenOrientation="portrait">
         </activity>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="thesis.masters.registrationplates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+
     </application>
 
 </manifest>
