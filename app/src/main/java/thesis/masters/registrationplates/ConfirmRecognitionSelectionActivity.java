@@ -126,4 +126,9 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         Intent recognizeOnPreRecordedVideoIntent = new Intent(this, RecognizeOnPreRecordedVideoActivity.class);
         startActivity(recognizeOnPreRecordedVideoIntent);
     }
+
+    public void recognizeOnPreRecordedVideoActivity() {
+        Intent recognizeOnPreRecordedVideoIntent = new Intent(this, RecognizeOnPreRecordedVideoActivity.class);
+        startActivity(recognizeOnPreRecordedVideoIntent);
+    }
 }
