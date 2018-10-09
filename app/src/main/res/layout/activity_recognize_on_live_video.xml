@@ -12,4 +12,21 @@
         android:id="@+id/rearCameraView"
         app:show_fps="true"/>
 
+    <TextView
+        android:id="@+id/recognitionVideoOutputTextView"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:textSize="20dp"
+        android:background="@android:color/holo_red_light"
+        android:layout_alignParentTop="true"
+        android:text="TextView" />
+
+    <CheckBox
+        android:id="@+id/enableOCRLiveVideoCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/holo_red_light"
+        android:text="@string/checkBoxEnableOCR" />
+
 </RelativeLayout>

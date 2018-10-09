@@ -14,6 +14,7 @@
     <string name="buttonPickImageFromGallery">Pick Image</string>
     <string name="buttonTakeAPhoto">Take a photo</string>
     <string name="buttonColorDetect">Detect color</string>
+    <string name="checkBoxEnableOCR">Enable OCR</string>
     <string-array name="recognitionMethodsArray">
         <item>Signature Analysis</item>
         <item>Cascade Classifier</item>

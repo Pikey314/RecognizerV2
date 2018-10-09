@@ -22,9 +22,9 @@
     <ImageView
         android:id="@+id/imageToBeRecognizedImageView"
         android:layout_width="match_parent"
-        android:layout_height="512dp"
+        android:layout_height="483dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="9dp"
+        android:layout_marginTop="38dp"
         tools:srcCompat="@tools:sample/avatars" />
 
     <Button
@@ -39,5 +39,13 @@
         android:layout_marginBottom="0dp"
         android:onClick="recognizeTestMethod1"
         android:text="Button" />
+
+    <TextView
+        android:id="@+id/recognitionImageOutputTextView"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:textSize="20dp"
+        android:layout_alignParentTop="true"
+        android:text="TextView" />
 </RelativeLayout>
 

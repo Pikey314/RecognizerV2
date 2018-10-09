@@ -1,163 +1,6 @@
 package thesis.masters.registrationplates;
 
 
-/*
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.media.ExifInterface;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Display;
-import android.view.View;
-import android.widget.ImageView;
-
-import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
-
-import java.io.IOException;
-
-public class RecognizeOnImageActivity extends AppCompatActivity {
-
-    ImageView imageToBeRecognized;
-    private static final int SELECTED_PICTURE = 101;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recognize_on_image);
-        //OpenCVLoader.initDebug();
-        this.imageToBeRecognized = (ImageView) findViewById(R.id.imageToBeRecognizedImageView);
-
-    }
-
-    public void pickImageFromGallery(View view) {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(galleryIntent, SELECTED_PICTURE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == SELECTED_PICTURE && resultCode == RESULT_OK && data != null)
-        {
-            Uri imageURI = data.getData();
-
-            //get path from uri
-
-            String imagePath = getPath(imageURI);
-
-            loadImage(imagePath);
-
-            displayImage(sampleImg);
-        }
-
-    }
-
-    private void displayImage(Mat mat) {
-        Bitmap bitmap = Bitmap.createBitmap(mat.cols(),mat.rows(),Bitmap.Config.RGB_565);
-
-        // mat to bitmap
-
-        Utils.matToBitmap(mat,bitmap);
-        imageToBeRecognized.setImageBitmap(bitmap);
-    }
-    Mat sampleImg;
-    private void loadImage(String path) {
-
-        Mat originalImage = Imgcodecs.imread(path); // image in BGR format
-        Mat rgbImg = new Mat();
-
-        //convert BGR to RGB
-
-        Imgproc.cvtColor(originalImage,rgbImg,Imgproc.COLOR_BGR2RGB);
-
-        Display display = getWindowManager().getDefaultDisplay();
-
-        Point size = new Point();
-        display.getSize(size);
-
-        int mobile_width = size.x;
-        int mobile_height = size.y;
-
-        sampleImg = new Mat();
-
-        double downSampleRatio = calculateSubSimpleSize(rgbImg,mobile_width,mobile_height);
-
-        Imgproc.resize(rgbImg,sampleImg,new Size(),downSampleRatio,downSampleRatio,Imgproc.INTER_AREA);
-
-
-        try {
-            ExifInterface exif = new ExifInterface(path);
-            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,1);
-            switch (orientation){
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    sampleImg = sampleImg.t();
-                    Core.flip(sampleImg,sampleImg,1);
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    sampleImg = sampleImg.t();
-                    Core.flip(sampleImg,sampleImg,0);
-                    break;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-    }
-
-    private double calculateSubSimpleSize(Mat src, int mobile_width, int mobile_height) {
-
-        final int width = src.width();
-        final int height = src.height();
-        double inSampleSize = 1;
-
-        if(height > mobile_height || width > mobile_width)
-        {
-            final double heightRatio = (double)mobile_height/ (double) height;
-            final double widthRatio = (double) mobile_width / (double) width;
-            inSampleSize = heightRatio < widthRatio ? height : width;
-        }
-
-        return inSampleSize;
-    }
-
-    private String getPath(Uri uri) {
-        if (uri == null)
-        {
-            return null;
-        }
-        else
-        {
-            String[] projection = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(uri,projection,null,null,null);
-            if (cursor!=null)
-            {
-                int col_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                cursor.moveToFirst();
-                return cursor.getString(col_index);
-            }
-        }
-        return uri.getPath();
-    }
-}
-*/
-
-
 
 
 import android.content.ContentValues;
@@ -170,9 +13,16 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -204,6 +54,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     Bitmap imageBitmap, grayBitmap;
     String liveGallerySelection;
     String mCurrentPhotoPath;
+    TextView textViewRecognitionOutput;
 
 
     @Override
@@ -211,6 +62,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognize_on_image);
         this.imageView = (ImageView) findViewById(R.id.imageToBeRecognizedImageView);
+        this.textViewRecognitionOutput = findViewById(R.id.recognitionImageOutputTextView);
         OpenCVLoader.initDebug();
         Bundle extras = getIntent().getExtras();
         if (extras != null)
@@ -224,6 +76,33 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
             pickImageButton.setText(R.string.buttonPickImageFromGallery);
 
     }
+
+    public void getTextFromImage(Bitmap bitmap){
+
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+
+        if (textRecognizer.isOperational())
+        {
+            Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+            SparseArray<TextBlock> items = textRecognizer.detect(frame);
+            StringBuilder sb = new StringBuilder();
+
+            for (int i=0; i<items.size(); i++)
+            {
+                TextBlock myItems = items.valueAt(i);
+                sb.append(myItems.getValue());
+                sb.append("\n");
+            }
+            textViewRecognitionOutput.setText(sb.toString());
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(),"Can't get text from Image",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
 
     public void pickImageFromGallery(View view) {
         switch (this.liveGallerySelection) {
@@ -417,6 +296,8 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
        imageView.setImageBitmap(grayBitmap);
 
+        getTextFromImage(imageBitmap);
+
     }
 }
 
@@ -501,3 +382,163 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                     }
                     tmpBitmap = Bitmap.createBitmap(imageBitmap,areaToCutWidth,areaToCutHeight,imageBitmap.getWidth()-oversizeWidth,imageBitmap.getHeight()-oversizeHeight);
                     imageBitmap = tmpBitmap;*/
+
+
+
+
+
+/*
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Display;
+import android.view.View;
+import android.widget.ImageView;
+
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+
+import java.io.IOException;
+
+public class RecognizeOnImageActivity extends AppCompatActivity {
+
+    ImageView imageToBeRecognized;
+    private static final int SELECTED_PICTURE = 101;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_recognize_on_image);
+        //OpenCVLoader.initDebug();
+        this.imageToBeRecognized = (ImageView) findViewById(R.id.imageToBeRecognizedImageView);
+
+    }
+
+    public void pickImageFromGallery(View view) {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, SELECTED_PICTURE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SELECTED_PICTURE && resultCode == RESULT_OK && data != null)
+        {
+            Uri imageURI = data.getData();
+
+            //get path from uri
+
+            String imagePath = getPath(imageURI);
+
+            loadImage(imagePath);
+
+            displayImage(sampleImg);
+        }
+
+    }
+
+    private void displayImage(Mat mat) {
+        Bitmap bitmap = Bitmap.createBitmap(mat.cols(),mat.rows(),Bitmap.Config.RGB_565);
+
+        // mat to bitmap
+
+        Utils.matToBitmap(mat,bitmap);
+        imageToBeRecognized.setImageBitmap(bitmap);
+    }
+    Mat sampleImg;
+    private void loadImage(String path) {
+
+        Mat originalImage = Imgcodecs.imread(path); // image in BGR format
+        Mat rgbImg = new Mat();
+
+        //convert BGR to RGB
+
+        Imgproc.cvtColor(originalImage,rgbImg,Imgproc.COLOR_BGR2RGB);
+
+        Display display = getWindowManager().getDefaultDisplay();
+
+        Point size = new Point();
+        display.getSize(size);
+
+        int mobile_width = size.x;
+        int mobile_height = size.y;
+
+        sampleImg = new Mat();
+
+        double downSampleRatio = calculateSubSimpleSize(rgbImg,mobile_width,mobile_height);
+
+        Imgproc.resize(rgbImg,sampleImg,new Size(),downSampleRatio,downSampleRatio,Imgproc.INTER_AREA);
+
+
+        try {
+            ExifInterface exif = new ExifInterface(path);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,1);
+            switch (orientation){
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    sampleImg = sampleImg.t();
+                    Core.flip(sampleImg,sampleImg,1);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    sampleImg = sampleImg.t();
+                    Core.flip(sampleImg,sampleImg,0);
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+    }
+
+    private double calculateSubSimpleSize(Mat src, int mobile_width, int mobile_height) {
+
+        final int width = src.width();
+        final int height = src.height();
+        double inSampleSize = 1;
+
+        if(height > mobile_height || width > mobile_width)
+        {
+            final double heightRatio = (double)mobile_height/ (double) height;
+            final double widthRatio = (double) mobile_width / (double) width;
+            inSampleSize = heightRatio < widthRatio ? height : width;
+        }
+
+        return inSampleSize;
+    }
+
+    private String getPath(Uri uri) {
+        if (uri == null)
+        {
+            return null;
+        }
+        else
+        {
+            String[] projection = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(uri,projection,null,null,null);
+            if (cursor!=null)
+            {
+                int col_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                cursor.moveToFirst();
+                return cursor.getString(col_index);
+            }
+        }
+        return uri.getPath();
+    }
+}
+*/

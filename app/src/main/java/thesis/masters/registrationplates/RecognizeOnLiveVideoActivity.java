@@ -4,9 +4,16 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceView;
+import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -29,14 +36,21 @@ import java.util.ListIterator;
 public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     CameraBridgeViewBase cameraBridgeViewBase;
-    Mat mat1, mat2, mat3, mat4, tmp, mat5, mat6;
+    Mat mat1, mat2, mat3, mat4, tmp, mat5, mat6, mat7, mat8, mat9;
+    Bitmap recognitionBitmap, recognitionBitmapPortrait, recognitionBitmapLandscape;
     BaseLoaderCallback baseLoaderCallback;
+    TextView textViewVideoRecognitionOutput;
+    CheckBox checkBoxOCRActive;
+    TextRecognizer textRecognizer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognize_on_live_video);
         this.cameraBridgeViewBase = (JavaCameraView) findViewById(R.id.rearCameraView);
+        this.textViewVideoRecognitionOutput = findViewById(R.id.recognitionVideoOutputTextView);
+        this.checkBoxOCRActive = findViewById(R.id.enableOCRLiveVideoCheckBox);
+        textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
         cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
         cameraBridgeViewBase.setCvCameraViewListener(this);
         this.baseLoaderCallback = new BaseLoaderCallback(this) {
@@ -62,6 +76,10 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mat1 = inputFrame.rgba();
+
+        mat7 = mat1;
+
+
         // recognize code
         //int initialImageBitmapHeight = imageBitmap.getHeight();
        // int initialImageBitmapWidth = imageBitmap.getWidth();
@@ -140,6 +158,11 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
             Imgproc.resize(mat5,mat6,mat6.size(),0,0,0);
             Core.flip(mat6,mat1,1);
         }
+
+        if (checkBoxOCRActive.isChecked())
+                getTextFromVideo(mat7,orientation);
+
+
         return mat1;
     }
 
@@ -160,6 +183,15 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         tmp = new Mat(width,height,CvType.CV_8U,new Scalar(4));
         mat5 = new Mat(width,height,CvType.CV_8U,new Scalar(4));
         mat6 = new Mat(width,height,CvType.CV_8U,new Scalar(4));
+        mat7 = new Mat(width,height,CvType.CV_8U,new Scalar(4));
+        mat8 = new Mat(width,height,CvType.CV_8U,new Scalar(4));
+        mat9 = new Mat(width,height,CvType.CV_8U,new Scalar(4));
+        recognitionBitmapPortrait = Bitmap.createBitmap(mat1.cols(),mat1.rows(),Bitmap.Config.ARGB_8888);
+        recognitionBitmapLandscape =  Bitmap.createBitmap(mat1.rows(),mat1.cols(),Bitmap.Config.ARGB_8888);
+
+
+
+
     }
 
     @Override
@@ -192,5 +224,41 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         {
             cameraBridgeViewBase.disableView();
         }
+    }
+
+    public void getTextFromVideo(Mat mat, int orientation){
+       /* Bitmap recognitionBitmap = Bitmap.createBitmap(mat.cols(),mat.rows(),Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(mat,recognitionBitmap);
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();*/
+
+       if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+           Utils.matToBitmap(mat, recognitionBitmapPortrait);
+           recognitionBitmap = recognitionBitmapPortrait;
+       } else
+       {
+           Utils.matToBitmap(mat, recognitionBitmapLandscape);
+           recognitionBitmap = recognitionBitmapLandscape;
+       }
+        if (textRecognizer.isOperational())
+        {
+            Frame frame = new Frame.Builder().setBitmap(recognitionBitmap).build();
+            final SparseArray<TextBlock> items = textRecognizer.detect(frame);
+            if (items.size()!=0) {
+                textViewVideoRecognitionOutput.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        StringBuilder sb = new StringBuilder();
+
+                        for (int i = 0; i < items.size(); i++) {
+                            TextBlock myItems = items.valueAt(i);
+                            sb.append(myItems.getValue());
+                            sb.append("\n");
+                        }
+                        textViewVideoRecognitionOutput.setText(sb.toString());
+                    }
+                });
+            }
+        }
+
     }
 }
