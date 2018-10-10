@@ -55,12 +55,14 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     String liveGallerySelection;
     String mCurrentPhotoPath;
     TextView textViewRecognitionOutput;
+    CharacterRecognition characterRecognition;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recognize_on_image);
+        characterRecognition = new CharacterRecognition();
         this.imageView = (ImageView) findViewById(R.id.imageToBeRecognizedImageView);
         this.textViewRecognitionOutput = findViewById(R.id.recognitionImageOutputTextView);
         OpenCVLoader.initDebug();
@@ -75,30 +77,6 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         else
             pickImageButton.setText(R.string.buttonPickImageFromGallery);
 
-    }
-
-    public void getTextFromImage(Bitmap bitmap){
-
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
-
-        if (textRecognizer.isOperational())
-        {
-            Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-            SparseArray<TextBlock> items = textRecognizer.detect(frame);
-            StringBuilder sb = new StringBuilder();
-
-            for (int i=0; i<items.size(); i++)
-            {
-                TextBlock myItems = items.valueAt(i);
-                sb.append(myItems.getValue());
-                sb.append("\n");
-            }
-            textViewRecognitionOutput.setText(sb.toString());
-        }
-        else
-        {
-            Toast.makeText(getApplicationContext(),"Can't get text from Image",Toast.LENGTH_SHORT).show();
-        }
     }
 
 
@@ -296,7 +274,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
        imageView.setImageBitmap(grayBitmap);
 
-        getTextFromImage(imageBitmap);
+        characterRecognition.getTextFromImage(imageBitmap,getApplicationContext(),this.textViewRecognitionOutput);
 
     }
 }

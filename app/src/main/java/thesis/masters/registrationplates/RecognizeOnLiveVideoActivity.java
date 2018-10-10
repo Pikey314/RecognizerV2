@@ -42,6 +42,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
     TextView textViewVideoRecognitionOutput;
     CheckBox checkBoxOCRActive;
     TextRecognizer textRecognizer;
+    CharacterRecognition characterRecognition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         this.cameraBridgeViewBase = (JavaCameraView) findViewById(R.id.rearCameraView);
         this.textViewVideoRecognitionOutput = findViewById(R.id.recognitionVideoOutputTextView);
         this.checkBoxOCRActive = findViewById(R.id.enableOCRLiveVideoCheckBox);
+        characterRecognition = new CharacterRecognition();
         textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
         cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
         cameraBridgeViewBase.setCvCameraViewListener(this);
@@ -160,7 +162,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         }
 
         if (checkBoxOCRActive.isChecked())
-                getTextFromVideo(mat7,orientation);
+                characterRecognition.getTextFromVideo(mat7,orientation,recognitionBitmapPortrait,recognitionBitmapLandscape,recognitionBitmap,textRecognizer,textViewVideoRecognitionOutput);
 
 
         return mat1;
@@ -226,10 +228,10 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         }
     }
 
-    public void getTextFromVideo(Mat mat, int orientation){
-       /* Bitmap recognitionBitmap = Bitmap.createBitmap(mat.cols(),mat.rows(),Bitmap.Config.ARGB_8888);
+/*    public void getTextFromVideo(Mat mat, int orientation){
+       *//* Bitmap recognitionBitmap = Bitmap.createBitmap(mat.cols(),mat.rows(),Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(mat,recognitionBitmap);
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();*/
+        TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();*//*
 
        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
            Utils.matToBitmap(mat, recognitionBitmapPortrait);
@@ -260,5 +262,5 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
             }
         }
 
-    }
+    }*/
 }
