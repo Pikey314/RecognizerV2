@@ -54,7 +54,8 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     Bitmap imageBitmap, grayBitmap;
     String liveGallerySelection;
     String mCurrentPhotoPath;
-    TextView textViewRecognitionOutput;
+    TextView textViewRecognitionOutput, textViewRecognitionOutput2, textViewRecognitionOutput3, textViewRecognitionOutput4;
+    ImageView plateImageView,plateImageView2,plateImageView3,plateImageView4;
     CharacterRecognition characterRecognition;
 
 
@@ -65,6 +66,21 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         characterRecognition = new CharacterRecognition();
         this.imageView = (ImageView) findViewById(R.id.imageToBeRecognizedImageView);
         this.textViewRecognitionOutput = findViewById(R.id.recognitionImageOutputTextView);
+        this.textViewRecognitionOutput2 = findViewById(R.id.recognitionImageOutputTextView2);
+        this.textViewRecognitionOutput3 = findViewById(R.id.recognitionImageOutputTextView3);
+        this.textViewRecognitionOutput4 = findViewById(R.id.recognitionImageOutputTextView4);
+        this.plateImageView = findViewById(R.id.plateStaticImageView);
+        this.plateImageView2 = findViewById(R.id.plateStaticImageView2);
+        this.plateImageView3 = findViewById(R.id.plateStaticImageView3);
+        this.plateImageView4 = findViewById(R.id.plateStaticImageView4);
+        this.plateImageView.setVisibility(View.INVISIBLE);
+        this.plateImageView2.setVisibility(View.INVISIBLE);
+        this.plateImageView3.setVisibility(View.INVISIBLE);
+        this.plateImageView4.setVisibility(View.INVISIBLE);
+        this.textViewRecognitionOutput.setText("");
+        this.textViewRecognitionOutput2.setText("");
+        this.textViewRecognitionOutput3.setText("");
+        this.textViewRecognitionOutput4.setText("");
         OpenCVLoader.initDebug();
         Bundle extras = getIntent().getExtras();
         if (extras != null)
@@ -122,7 +138,14 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        this.textViewRecognitionOutput.setText("");
+        this.textViewRecognitionOutput2.setText("");
+        this.textViewRecognitionOutput3.setText("");
+        this.textViewRecognitionOutput4.setText("");
+        this.plateImageView.setVisibility(View.INVISIBLE);
+        this.plateImageView2.setVisibility(View.INVISIBLE);
+        this.plateImageView3.setVisibility(View.INVISIBLE);
+        this.plateImageView4.setVisibility(View.INVISIBLE);
         if (data != null && resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
             this.imageURI = data.getData();
 
@@ -197,85 +220,102 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     }
 
     public void recognizeTestMethod1(View view) {
-       // OpenCVLoader.initDebug();
-        //Bitmap initialImageBitmap = BitmapFactory.decodeResource(getResources(),R.id.imageToBeRecognizedImageView);
 
-        int initialImageBitmapHeight = imageBitmap.getHeight();
-        int initialImageBitmapWidth = imageBitmap.getWidth();
-
-        Mat imageMat1 = new Mat(initialImageBitmapHeight,initialImageBitmapWidth,CvType.CV_8U,new Scalar(4));
-        Mat imageMat2 = new Mat(initialImageBitmapHeight,initialImageBitmapWidth,CvType.CV_8U,new Scalar(4));
-        Mat imageMat3 = new Mat(initialImageBitmapHeight,initialImageBitmapWidth,CvType.CV_8U,new Scalar(4));
-        Mat imageMat4 = new Mat(initialImageBitmapHeight,initialImageBitmapWidth,CvType.CV_8U,new Scalar(4));
-
-        Mat tmp = new Mat(initialImageBitmapHeight,initialImageBitmapWidth,CvType.CV_8U,new Scalar(4));
-
-        Bitmap copyBitmap = imageBitmap.copy(Bitmap.Config.ARGB_8888,true);
-        Utils.bitmapToMat(copyBitmap,imageMat1);
-
-        //RGB -> Gray
-        Imgproc.cvtColor(imageMat1,imageMat3,Imgproc.COLOR_RGB2GRAY,8);
-
-        Imgproc.dilate(imageMat3,tmp,Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9,9)));
-        Imgproc.erode(tmp,imageMat4,Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9,9)));
-
-        Core.absdiff(imageMat4,imageMat3,imageMat2);
-
-        Imgproc.Sobel(imageMat2,imageMat2,CvType.CV_8U,1,0,3,1,0.4,4);
-
-        Imgproc.GaussianBlur(imageMat2,imageMat2,new Size(5,5),2);
-
-        Imgproc.dilate(imageMat2,imageMat2,Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3,3)));
-
-        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(17,3));
-
-        Imgproc.morphologyEx(imageMat2,imageMat2,Imgproc.MORPH_CLOSE,element);
-
-        Imgproc.threshold(imageMat2, imageMat2, 0 ,255, Imgproc.THRESH_OTSU+Imgproc.THRESH_BINARY);
-
-        grayBitmap = Bitmap.createBitmap(initialImageBitmapWidth,initialImageBitmapHeight,Bitmap.Config.RGB_565);
-
-
-
-        ArrayList<RotatedRect> rects = new  ArrayList<RotatedRect>();
-        ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-        Imgproc.findContours(imageMat2, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
-
-        ListIterator<MatOfPoint> itc = contours.listIterator();
-        while(itc.hasNext())
+        if (imageBitmap != null)
         {
-            MatOfPoint2f mp2f = new MatOfPoint2f(itc.next().toArray());
-            RotatedRect mr = Imgproc.minAreaRect(mp2f);
-            double area = Math.abs(Imgproc.contourArea(mp2f));
+            // OpenCVLoader.initDebug();
+            //Bitmap initialImageBitmap = BitmapFactory.decodeResource(getResources(),R.id.imageToBeRecognizedImageView);
 
-            double bbArea= mr.size.area();
-            double ratio = area / bbArea;
-            if( (ratio < 0.45) || (bbArea < 400) )
-            {
-                itc.remove();  // other than deliberately making the program slow,
-                // does erasing the contour have any purpose?
+            int initialImageBitmapHeight = imageBitmap.getHeight();
+            int initialImageBitmapWidth = imageBitmap.getWidth();
+
+            Mat imageMat1 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+            Mat imageMat2 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+            Mat imageMat3 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+            Mat imageMat4 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+
+            Mat tmp = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+
+            Bitmap copyBitmap = imageBitmap.copy(Bitmap.Config.ARGB_8888, true);
+            Utils.bitmapToMat(copyBitmap, imageMat1);
+
+            //RGB -> Gray
+            Imgproc.cvtColor(imageMat1, imageMat3, Imgproc.COLOR_RGB2GRAY, 8);
+
+            Imgproc.dilate(imageMat3, tmp, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9, 9)));
+            Imgproc.erode(tmp, imageMat4, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(9, 9)));
+
+            Core.absdiff(imageMat4, imageMat3, imageMat2);
+
+            Imgproc.Sobel(imageMat2, imageMat2, CvType.CV_8U, 1, 0, 3, 1, 0.4, 4);
+
+            Imgproc.GaussianBlur(imageMat2, imageMat2, new Size(5, 5), 2);
+
+            Imgproc.dilate(imageMat2, imageMat2, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3)));
+
+            Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(17, 3));
+
+            Imgproc.morphologyEx(imageMat2, imageMat2, Imgproc.MORPH_CLOSE, element);
+
+            Imgproc.threshold(imageMat2, imageMat2, 0, 255, Imgproc.THRESH_OTSU + Imgproc.THRESH_BINARY);
+
+            grayBitmap = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
+
+
+            ArrayList<RotatedRect> rects = new ArrayList<RotatedRect>();
+            ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+            Imgproc.findContours(imageMat2, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+
+            ListIterator<MatOfPoint> itc = contours.listIterator();
+            while (itc.hasNext()) {
+                MatOfPoint2f mp2f = new MatOfPoint2f(itc.next().toArray());
+                RotatedRect mr = Imgproc.minAreaRect(mp2f);
+                double area = Math.abs(Imgproc.contourArea(mp2f));
+
+                double bbArea = mr.size.area();
+                double ratio = area / bbArea;
+                if ((ratio < 0.45) || (bbArea < 400)) {
+                    itc.remove();  // other than deliberately making the program slow,
+                    // does erasing the contour have any purpose?
+                } else {
+                    rects.add(mr);
+                }
+
+
             }
-            else
-            {
-                rects.add(mr);
+
+            for (int i = 0; i < contours.size(); i++) {
+                Imgproc.drawContours(imageMat1, contours, i, new Scalar(100, 255, 255), 5);
             }
 
 
+            Utils.matToBitmap(imageMat1, grayBitmap);
 
+            imageView.setImageBitmap(grayBitmap);
+
+            int recognizedPlates = characterRecognition.getTextFromImage(imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4);
+            switch (recognizedPlates) {
+                case 1:
+                    this.plateImageView.setVisibility(View.VISIBLE);
+                    break;
+                case 2:
+                    this.plateImageView.setVisibility(View.VISIBLE);
+                    this.plateImageView2.setVisibility(View.VISIBLE);
+                    break;
+                case 3:
+                    this.plateImageView.setVisibility(View.VISIBLE);
+                    this.plateImageView2.setVisibility(View.VISIBLE);
+                    this.plateImageView3.setVisibility(View.VISIBLE);
+                    break;
+                case 4:
+                    this.plateImageView.setVisibility(View.VISIBLE);
+                    this.plateImageView2.setVisibility(View.VISIBLE);
+                    this.plateImageView3.setVisibility(View.VISIBLE);
+                    this.plateImageView4.setVisibility(View.VISIBLE);
+                    break;
+
+            }
         }
-
-        for (int i = 0; i < contours.size(); i++) {
-            Imgproc.drawContours(imageMat1, contours, i, new Scalar(100, 255, 255), 5);
-        }
-
-
-
-        Utils.matToBitmap(imageMat1,grayBitmap);
-
-       imageView.setImageBitmap(grayBitmap);
-
-        characterRecognition.getTextFromImage(imageBitmap,getApplicationContext(),this.textViewRecognitionOutput);
-
     }
 }
 

@@ -16,22 +16,37 @@ import org.opencv.core.Mat;
 
 public class CharacterRecognition {
 
-    public void getTextFromImage(Bitmap bitmap, Context context, TextView textView){
-
+    public int getTextFromImage(Bitmap bitmap, Context context, TextView textView, TextView textView2, TextView textView3, TextView textView4){
+        int flag = 0;
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
 
         if (textRecognizer.isOperational())
         {
             Frame frame = new Frame.Builder().setBitmap(bitmap).build();
             SparseArray<TextBlock> items = textRecognizer.detect(frame);
-            String sb;
+            String sb, s1="", s2="", s3="";
 
             for (int i=0; i<items.size(); i++) {
                 TextBlock myItems = items.valueAt(i);
                 sb = myItems.getValue();
-                if (sb.length() >= 4 && sb.length() < 10 && !sb.matches(".*[a-z].*")) {
-                    textView.setText(sb);
-                    break;
+                if (sb.length() >= 4 && sb.length() < 10 && !sb.matches(".*[a-z].*") && sb.matches(".*\\d+.*")) {
+                    if (flag == 0) {
+                        textView.setText(sb);
+                        s1 = sb;
+                        flag = 1;
+                    } else if (flag == 1 && !sb.equals(s1)) {
+                        textView2.setText(sb);
+                        s2 = sb;
+                        flag = 2;
+                    } else if (flag == 2 && !sb.equals(s1) && !sb.equals(s2)) {
+                        textView3.setText(sb);
+                        s3 = sb;
+                        flag = 3;
+                    } else if (flag == 3 && !sb.equals(s1) && !sb.equals(s2) && !sb.equals(s3)) {
+                        textView3.setText(sb);
+                        flag = 4;
+                        break;
+                    }
 
                 }
             }
@@ -41,6 +56,7 @@ public class CharacterRecognition {
         {
             Toast.makeText(context,"Can't get text from Image",Toast.LENGTH_SHORT).show();
         }
+        return flag;
     }
 
 
@@ -63,14 +79,17 @@ public class CharacterRecognition {
                 textView.post(new Runnable() {
                     @Override
                     public void run() {
-                        StringBuilder sb = new StringBuilder();
+                        String sb;
 
                         for (int i = 0; i < items.size(); i++) {
                             TextBlock myItems = items.valueAt(i);
-                            sb.append(myItems.getValue());
-                            sb.append("\n");
+                            sb = myItems.getValue();
+                            if (sb.length() >= 4 && sb.length() < 10 && !sb.matches(".*[a-z].*") && sb.matches(".*\\d+.*")) {
+                                textView.setText(sb);
+                                break;
+                            }
                         }
-                        textView.setText(sb.toString());
+
                     }
                 });
             }
