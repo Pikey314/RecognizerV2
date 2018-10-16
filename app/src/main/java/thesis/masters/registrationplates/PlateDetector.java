@@ -1,7 +1,11 @@
 package thesis.masters.registrationplates;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.ContactsContract;
+import android.util.Log;
+import android.widget.Toast;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -15,6 +19,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 public class PlateDetector {
@@ -89,7 +94,8 @@ public class PlateDetector {
         return bitmapToReturn;
     }
 
-    public Bitmap morphologicalRecognitionMethod(Bitmap bitmap){
+    // DODAC PAREMTRY I MENU USTAWIEN -> h = daleko/sredni/blisko,  -> czarna tablica czy biala w if
+    public Bitmap morphologicalRecognitionMethod(Bitmap bitmap, Context context){
 
         int initialImageBitmapHeight = bitmap.getHeight();
         int initialImageBitmapWidth = bitmap.getWidth();
@@ -97,6 +103,7 @@ public class PlateDetector {
         Mat initialImageMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
         Mat grayScaleMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
         Mat higherContrastMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat matToReturn = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
 
         /* Mat imageMat4 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
 
@@ -125,9 +132,97 @@ public class PlateDetector {
 
         Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_CLOSE,kernel);
 
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, h/2));
+
+        Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_OPEN,kernel);
+
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h*2, 1));
+
+        Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_OPEN,kernel);
+
+        double maxPixelValue = Core.minMaxLoc(higherContrastMat).maxVal;
+
+        //Toast.makeText(context,Double.toString(maxPixelValue), Toast.LENGTH_LONG).show();
+
+        Imgproc.threshold(higherContrastMat,higherContrastMat,maxPixelValue-20,255,Imgproc.THRESH_BINARY);
+
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h, h/2));
+
+        Imgproc.dilate(higherContrastMat,higherContrastMat,kernel);
+
+        //kontury
+
+        List<MatOfPoint> contours = new ArrayList<>();
+
+        Imgproc.findContours(higherContrastMat,contours,new Mat(),Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+
+        Utils.bitmapToMat(bitmap,matToReturn);
+
+        int contourThickness = bitmap.getHeight()/100;
+
+        for (int i = 0; i < contours.size(); i++) {
+            Imgproc.drawContours(matToReturn, contours, i, new Scalar(0, 0, 255), contourThickness);
+        }
+
+
         Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
 
-        Utils.matToBitmap(higherContrastMat,bitmapToReturn);
+        Utils.matToBitmap(matToReturn,bitmapToReturn);
+
+        return bitmapToReturn;
+
+
+
+    }
+
+    public Bitmap houghRecognitionMethod (Bitmap bitmap, Context context){
+
+        int initialImageBitmapHeight = bitmap.getHeight();
+        int initialImageBitmapWidth = bitmap.getWidth();
+
+        Mat initialImageMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat grayScaleMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat averageImage = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat subImage = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+
+        /* Mat imageMat4 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+
+        Mat tmp = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));*/
+
+        Bitmap copyBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Utils.bitmapToMat(copyBitmap, initialImageMat);
+
+        Imgproc.cvtColor(initialImageMat, grayScaleMat, Imgproc.COLOR_RGB2GRAY, 8);
+
+        Imgproc.medianBlur(grayScaleMat,grayScaleMat,3);
+
+        Imgproc.blur(grayScaleMat,averageImage,new Size(20,20));
+
+        Core.subtract(grayScaleMat,averageImage,averageImage);
+
+        Imgproc.threshold(averageImage,averageImage,30,255,Imgproc.THRESH_BINARY);
+
+        Imgproc.medianBlur(averageImage,averageImage, 31);
+
+/*      TO JEST OGOLNIE DOBRY POMYSL
+        Imgproc.equalizeHist(grayScaleMat,grayScaleMat);
+
+        Core.subtract(averageImage,grayScaleMat,subImage);
+
+        Imgproc.threshold(subImage,subImage,60,255,Imgproc.THRESH_BINARY);*/
+
+        //Core.subtract(averageImage,subImage,subImage);
+
+
+
+
+
+
+        Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
+
+        Utils.matToBitmap(averageImage,bitmapToReturn);
+
+
 
         return bitmapToReturn;
 

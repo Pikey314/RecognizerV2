@@ -11,6 +11,7 @@ public class ViewAdjuster {
 
     public static final int MAX_ALLOWED_BITMAP_HEIGHT = 4096;
     public static final int MAX_ALLOWED_BITMAP_WIDTH = 4096;
+    public static final int MAX_ALLOWED_BYTE_SIZE = 15000000;
 
 
     // Method to prevent bitmap from oversizing to fit it into imageView
@@ -38,6 +39,20 @@ public class ViewAdjuster {
         }
         fixedBitmap = Bitmap.createBitmap(bitmap,areaToCutWidth,areaToCutHeight,bitmap.getWidth()-oversizeWidth,bitmap.getHeight()-oversizeHeight);
         return fixedBitmap;
+
+    }
+
+    public Bitmap scaleBitmap(Bitmap bitmap){
+        Bitmap scaledBitmap;
+        int bitmapSize = bitmap.getByteCount();
+        int sampleSize = 1;
+        while (MAX_ALLOWED_BYTE_SIZE * sampleSize < bitmapSize) {
+            sampleSize++;
+        }
+        int newWidth = bitmap.getWidth()/sampleSize;
+        int newHeight = bitmap.getHeight()/sampleSize;
+        scaledBitmap = Bitmap.createScaledBitmap(bitmap,newWidth,newHeight,false);
+        return scaledBitmap;
 
     }
 

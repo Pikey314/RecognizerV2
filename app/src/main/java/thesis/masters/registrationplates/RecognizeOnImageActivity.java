@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -121,8 +122,11 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                 imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageURI);
                 if (imageBitmap.getHeight()>ViewAdjuster.MAX_ALLOWED_BITMAP_HEIGHT || imageBitmap.getWidth()>ViewAdjuster.MAX_ALLOWED_BITMAP_WIDTH)
                     imageBitmap = viewAdjuster.adjustBitmap(imageBitmap);
+                if (imageBitmap.getByteCount() > viewAdjuster.MAX_ALLOWED_BYTE_SIZE)
+                    this.imageBitmap = viewAdjuster.scaleBitmap(this.imageBitmap);
 
                 this.imageView.setImageBitmap(imageBitmap);
+                Toast.makeText(getApplicationContext(),Integer.toString(this.imageBitmap.getByteCount()), Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -133,8 +137,11 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                 imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
                 if (imageBitmap.getHeight()>ViewAdjuster.MAX_ALLOWED_BITMAP_HEIGHT || imageBitmap.getWidth()>ViewAdjuster.MAX_ALLOWED_BITMAP_WIDTH)
                     imageBitmap = viewAdjuster.adjustBitmap(imageBitmap);
+                if (imageBitmap.getByteCount() > viewAdjuster.MAX_ALLOWED_BYTE_SIZE)
+                    this.imageBitmap = viewAdjuster.scaleBitmap(this.imageBitmap);
 
                 this.imageView.setImageBitmap(imageBitmap);
+                Toast.makeText(getApplicationContext(),Integer.toString(this.imageBitmap.getByteCount()), Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -166,7 +173,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         if (this.imageBitmap != null)
         {
 
-            this.recognizedBitmap = plateDetector.morphologicalRecognitionMethod(this.imageBitmap);
+            this.recognizedBitmap = plateDetector.houghRecognitionMethod(this.imageBitmap, getApplicationContext());
             imageView.setImageBitmap(this.recognizedBitmap);
             int recognizedPlates = this.characterRecognition.getTextFromImage(imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4);
             this.viewAdjuster.showPlateImageViewsAfterRecognition(recognizedPlates, this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);
