@@ -13,10 +13,12 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -179,11 +181,18 @@ public class PlateDetector {
 
         int initialImageBitmapHeight = bitmap.getHeight();
         int initialImageBitmapWidth = bitmap.getWidth();
+        List<MatOfPoint> contours = new ArrayList<>();
+        List<MatOfPoint> contours2 = new ArrayList<>();
+        ArrayList<Point> pointsOfContours = new ArrayList<Point>();
+        int centerX = 0;
+        int centerY = 0;
+        int numberOfPoints = 0;
 
         Mat initialImageMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
         Mat grayScaleMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
         Mat averageImage = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
-        Mat subImage = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat thresholdedImage = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat matToReturn = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
 
         /* Mat imageMat4 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
 
@@ -200,11 +209,61 @@ public class PlateDetector {
 
         Core.subtract(grayScaleMat,averageImage,averageImage);
 
-        Imgproc.threshold(averageImage,averageImage,30,255,Imgproc.THRESH_BINARY);
 
-        Imgproc.medianBlur(averageImage,averageImage, 31);
 
-/*      TO JEST OGOLNIE DOBRY POMYSL
+        Imgproc.threshold(averageImage,thresholdedImage,30,255,Imgproc.THRESH_BINARY);
+
+        Imgproc.findContours(thresholdedImage,contours2,new Mat(),Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
+
+        Imgproc.medianBlur(thresholdedImage,averageImage, 47);
+
+
+
+        Imgproc.findContours(averageImage,contours,new Mat(),Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+
+        Moments moments;
+
+
+        Utils.bitmapToMat(bitmap,matToReturn);
+
+        int contourThickness = bitmap.getHeight()/100;
+        Point center;
+        for (int i = 0; i < contours.size(); i++) {
+            moments = Imgproc.moments(contours.get(i));
+            int x = (int) (moments.get_m10() / moments.get_m00());
+            int y = (int) (moments.get_m01() / moments.get_m00());
+            if(x > initialImageBitmapWidth/10 && x < (initialImageBitmapWidth - (initialImageBitmapWidth/10))) {
+                pointsOfContours.add(new Point(x, y));
+                centerX += x;
+                centerY += y;
+                numberOfPoints++;
+                //Imgproc.drawContours(matToReturn, contours, i, new Scalar(0, 0, 255), contourThickness);
+                //Imgproc.circle(matToReturn, pointsOfContours.get(i), 7, new Scalar(0, 0, 255), -1);
+            }
+
+        }
+
+        centerX = centerX/numberOfPoints;
+        centerY = centerY/numberOfPoints;
+
+        Imgproc.circle(matToReturn,new Point(centerX,centerY),7, new Scalar (255, 0, 0), -1);
+
+        for (int i = 0; i < contours2.size(); i++) {
+            double test = Imgproc.pointPolygonTest(new MatOfPoint2f(contours2.get(i).toArray()),new Point(centerX,centerY),false);
+            if (test > -1)
+            Imgproc.drawContours(matToReturn, contours2, i, new Scalar(0, 0, 255), -1);
+
+        }
+
+        //To uzaleznic od wielkosci obrazka
+        double smallPlateRectangleWidth = initialImageBitmapWidth/5;
+        double smallPlateRectangleHeight = initialImageBitmapHeight/20;
+
+
+        Imgproc.rectangle(matToReturn,new Point(centerX-smallPlateRectangleWidth,centerY-smallPlateRectangleHeight),new Point(centerX+smallPlateRectangleWidth,centerY+smallPlateRectangleHeight), new Scalar(0,255,0));
+
+
+        /*      TO JEST OGOLNIE DOBRY POMYSL
         Imgproc.equalizeHist(grayScaleMat,grayScaleMat);
 
         Core.subtract(averageImage,grayScaleMat,subImage);
@@ -220,7 +279,7 @@ public class PlateDetector {
 
         Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
 
-        Utils.matToBitmap(averageImage,bitmapToReturn);
+        Utils.matToBitmap(thresholdedImage,bitmapToReturn);
 
 
 
