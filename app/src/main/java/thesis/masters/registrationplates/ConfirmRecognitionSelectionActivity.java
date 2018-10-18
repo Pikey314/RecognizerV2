@@ -39,24 +39,24 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
             liveOrGallery = extras.getString("liveOrGallerySelectionText");
             String videOrPhoto = extras.getString("videoOrPhotoSelectionText");
             String recognitionMethod = extras.getString("spinnerValue");
-            this.confirmationOfSelectionTextView.setText(liveOrGallery + videOrPhoto + recognitionMethod);
+            this.confirmationOfSelectionTextView.setText("Increase accuracy for " + recognitionMethod + " method");
             switch (liveOrGallery) {
-                case "Live":
-                    if (videOrPhoto.equals("Video")) {
-                        this.selectResourceButton.setBackgroundResource(R.drawable.video_live_icon);
+                case "LIVE":
+                    if (videOrPhoto.equals("VIDEO")) {
+                        this.selectResourceButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.video_live_icon,0,0,0);
                         this.selection = "LiveVideo";
                     } else {
-                        this.selectResourceButton.setBackgroundResource(R.drawable.photo_live_icon);
+                        this.selectResourceButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.photo_live_icon,0,0,0);
                         this.selection = "Image";
                     }
                     break;
-                case "Gallery":
-                    if (videOrPhoto.equals("Video")) {
-                        this.selectResourceButton.setBackgroundResource(R.drawable.video_gallery_icon);
+                case "GALLERY":
+                    if (videOrPhoto.equals("VIDEO")) {
+                        this.selectResourceButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.video_gallery_icon,0,0,0);
                         this.selection = "GalleryVideo";
 
                     } else {
-                        this.selectResourceButton.setBackgroundResource(R.drawable.photo_gallery_icon);
+                        this.selectResourceButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.photo_gallery_icon,0,0,0);
                         this.selection = "Image";
 
                     }
