@@ -26,7 +26,7 @@ import java.util.ListIterator;
 
 public class PlateDetector {
 
-    public Bitmap testMethod(Bitmap bitmap){
+    public Bitmap edgeContourRecognitionMethod(Bitmap bitmap) {
 
         int initialImageBitmapHeight = bitmap.getHeight();
         int initialImageBitmapWidth = bitmap.getWidth();
@@ -36,6 +36,7 @@ public class PlateDetector {
         Mat imageMat3 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
         Mat imageMat4 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
 
+        ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Mat tmp = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
 
         Bitmap copyBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
@@ -49,55 +50,55 @@ public class PlateDetector {
 
         Core.absdiff(imageMat4, imageMat3, imageMat2);
 
-        Imgproc.Sobel(imageMat2, imageMat2, CvType.CV_8U, 1, 0, 3, 1, 0.4, 4);
-
         Imgproc.GaussianBlur(imageMat2, imageMat2, new Size(5, 5), 2);
 
+        Imgproc.Sobel(imageMat2, imageMat2, CvType.CV_8U, 1, 0, 3, 1, 0.4, 4);
+
+        //TEST
+        double maxPixelValue = Core.minMaxLoc(imageMat2).maxVal;
+
+        //Toast.makeText(context,Double.toString(maxPixelValue), Toast.LENGTH_LONG).show();
+
+        Imgproc.threshold(imageMat2,imageMat2,maxPixelValue-70,255,Imgproc.THRESH_BINARY);
+        //END TEST
         Imgproc.dilate(imageMat2, imageMat2, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3)));
 
-        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(17, 3));
+        Mat element = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(27, 9));
 
         Imgproc.morphologyEx(imageMat2, imageMat2, Imgproc.MORPH_CLOSE, element);
 
-        Imgproc.threshold(imageMat2, imageMat2, 0, 255, Imgproc.THRESH_OTSU + Imgproc.THRESH_BINARY);
-
-        Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
-
-
-        ArrayList<RotatedRect> rects = new ArrayList<RotatedRect>();
-        ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Imgproc.findContours(imageMat2, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
 
-        ListIterator<MatOfPoint> itc = contours.listIterator();
-        while (itc.hasNext()) {
-            MatOfPoint2f mp2f = new MatOfPoint2f(itc.next().toArray());
-            RotatedRect mr = Imgproc.minAreaRect(mp2f);
-            double area = Math.abs(Imgproc.contourArea(mp2f));
 
-            double bbArea = mr.size.area();
-            double ratio = area / bbArea;
-            if ((ratio < 0.45) || (bbArea < 400)) {
-                itc.remove();  // other than deliberately making the program slow,
-                // does erasing the contour have any purpose?
-            } else {
-                rects.add(mr);
+        if(contours.size() > 0) {
+            int biggestContourIndex = 0;
+            MatOfPoint biggestContour = contours.get(0);
+            if (contours.size() > 1) {
+                double biggestContourArea = Imgproc.contourArea(biggestContour);
+                for (int i = 1; i < contours.size(); i++) {
+                    if (biggestContourArea < Imgproc.contourArea(contours.get(i))) {
+                        biggestContourArea = Imgproc.contourArea(contours.get(i));
+                        biggestContourIndex = i;
+                    }
+                }
             }
-
-
+            Imgproc.drawContours(imageMat1, contours, biggestContourIndex, new Scalar(100, 255, 255), 5);
         }
 
-        for (int i = 0; i < contours.size(); i++) {
-            Imgproc.drawContours(imageMat1, contours, i, new Scalar(100, 255, 255), 5);
-        }
-
-
-        Utils.matToBitmap(imageMat2, bitmapToReturn);
-
+        Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
+        Utils.matToBitmap(imageMat1, bitmapToReturn);
         return bitmapToReturn;
     }
 
+
+
+
+
+
+
+
     // DODAC PAREMTRY I MENU USTAWIEN -> h = daleko/sredni/blisko,  -> czarna tablica czy biala w if
-    public Bitmap morphologicalRecognitionMethod(Bitmap bitmap, Context context){
+    public Bitmap morphologicalTransformationsRecognitionMethod(Bitmap bitmap){
 
         int initialImageBitmapHeight = bitmap.getHeight();
         int initialImageBitmapWidth = bitmap.getWidth();
@@ -177,7 +178,7 @@ public class PlateDetector {
 
     }
 
-    public Bitmap houghRecognitionMethod (Bitmap bitmap, Context context){
+    public Bitmap medianCenterOfMomentRecognitionMethod (Bitmap bitmap){
 
         int initialImageBitmapHeight = bitmap.getHeight();
         int initialImageBitmapWidth = bitmap.getWidth();
@@ -215,6 +216,7 @@ public class PlateDetector {
 
         Imgproc.findContours(thresholdedImage,contours2,new Mat(),Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
 
+        //Blisko ksize np. 47, srednio ksize np. 31
         Imgproc.medianBlur(thresholdedImage,averageImage, 47);
 
 
@@ -243,34 +245,27 @@ public class PlateDetector {
 
         }
 
-        centerX = centerX/numberOfPoints;
-        centerY = centerY/numberOfPoints;
+        if (numberOfPoints != 0) {
+            centerX = centerX / numberOfPoints;
+            centerY = centerY / numberOfPoints;
 
-        Imgproc.circle(matToReturn,new Point(centerX,centerY),7, new Scalar (255, 0, 0), -1);
+            Imgproc.circle(matToReturn, new Point(centerX, centerY), 7, new Scalar(255, 0, 0), -1);
 
-        for (int i = 0; i < contours2.size(); i++) {
-            double test = Imgproc.pointPolygonTest(new MatOfPoint2f(contours2.get(i).toArray()),new Point(centerX,centerY),false);
-            if (test > -1)
-            Imgproc.drawContours(matToReturn, contours2, i, new Scalar(0, 0, 255), -1);
+            for (int i = 0; i < contours2.size(); i++) {
+                double test = Imgproc.pointPolygonTest(new MatOfPoint2f(contours2.get(i).toArray()), new Point(centerX, centerY), false);
+                if (test > -1)
+                    Imgproc.drawContours(matToReturn, contours2, i, new Scalar(0, 0, 255), -1);
+
+            }
+
+            //To uzaleznic od wielkosci obrazka
+            double smallPlateRectangleWidth = initialImageBitmapWidth / 5;
+            double smallPlateRectangleHeight = initialImageBitmapHeight / 20;
+
+
+            Imgproc.rectangle(matToReturn, new Point(centerX - smallPlateRectangleWidth, centerY - smallPlateRectangleHeight), new Point(centerX + smallPlateRectangleWidth, centerY + smallPlateRectangleHeight), new Scalar(0, 255, 0));
 
         }
-
-        //To uzaleznic od wielkosci obrazka
-        double smallPlateRectangleWidth = initialImageBitmapWidth/5;
-        double smallPlateRectangleHeight = initialImageBitmapHeight/20;
-
-
-        Imgproc.rectangle(matToReturn,new Point(centerX-smallPlateRectangleWidth,centerY-smallPlateRectangleHeight),new Point(centerX+smallPlateRectangleWidth,centerY+smallPlateRectangleHeight), new Scalar(0,255,0));
-
-
-        /*      TO JEST OGOLNIE DOBRY POMYSL
-        Imgproc.equalizeHist(grayScaleMat,grayScaleMat);
-
-        Core.subtract(averageImage,grayScaleMat,subImage);
-
-        Imgproc.threshold(subImage,subImage,60,255,Imgproc.THRESH_BINARY);*/
-
-        //Core.subtract(averageImage,subImage,subImage);
 
 
 
@@ -279,13 +274,76 @@ public class PlateDetector {
 
         Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
 
-        Utils.matToBitmap(thresholdedImage,bitmapToReturn);
+        Utils.matToBitmap(matToReturn,bitmapToReturn);
 
 
 
         return bitmapToReturn;
-
-
-
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /*   public Bitmap method3 (Bitmap bitmap) {
+
+        int initialImageBitmapHeight = bitmap.getHeight();
+        int initialImageBitmapWidth = bitmap.getWidth();
+
+        Mat initialImageMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat grayScaleMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat sobelMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+
+        Bitmap copyBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Utils.bitmapToMat(copyBitmap, initialImageMat);
+
+        Imgproc.GaussianBlur(initialImageMat,initialImageMat,new Size(3,3),0,0, Core.BORDER_DEFAULT);
+
+        Imgproc.cvtColor(initialImageMat, grayScaleMat, Imgproc.COLOR_RGB2GRAY, 8);
+
+
+        Imgproc.Canny(grayScaleMat,sobelMat,50,200,3,false);
+
+        List<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(sobelMat,contours,new Mat(),Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+
+
+        for (int i = 0; i < contours2.size(); i++) {
+                Imgproc.drawContours(matToReturn, contours2, i, new Scalar(0, 0, 255), -1);
+
+        }
+
+
+        //Imgproc.Sobel(grayScaleMat,sobelMat,CvType.CV_8U,1,1,3);
+
+        //Core.subtract(sobelMat,grayScaleMat,grayScaleMat);
+
+
+        Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
+
+        Utils.matToBitmap(grayScaleMat,bitmapToReturn);
+
+        return bitmapToReturn;
+
+    }*/
+
 }

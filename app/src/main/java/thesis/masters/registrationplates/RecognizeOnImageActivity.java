@@ -173,7 +173,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         if (this.imageBitmap != null)
         {
 
-            this.recognizedBitmap = plateDetector.houghRecognitionMethod(this.imageBitmap, getApplicationContext());
+            //this.recognizedBitmap = plateDetector.testMethod(this.imageBitmap);
             imageView.setImageBitmap(this.recognizedBitmap);
             int recognizedPlates = this.characterRecognition.getTextFromImage(imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4);
             this.viewAdjuster.showPlateImageViewsAfterRecognition(recognizedPlates, this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);

@@ -7,20 +7,21 @@
     <string name="help">Help</string>
     <string name="imageView02">ImageView2</string>
     <string name="recognitionMethodSpinnerPrompt">Choose a recognition method</string>
-    <string name="radioButtonLive">Live</string>
-    <string name="radioButtonGallery">Gallery</string>
-    <string name="radioButtonPhoto">Photo</string>
-    <string name="radioButtonVideo">Video</string>
+    <string name="radioButtonLive">LIVE</string>
+    <string name="radioButtonGallery">GALLERY</string>
+    <string name="radioButtonPhoto">IMAGE</string>
+    <string name="radioButtonVideo">VIDEO</string>
     <string name="buttonPickImageFromGallery">Pick Image</string>
     <string name="buttonTakeAPhoto">Take a photo</string>
     <string name="buttonColorDetect">Detect color</string>
     <string name="checkBoxEnableOCR">Enable OCR</string>
     <string-array name="recognitionMethodsArray">
-        <item>Signature Analysis</item>
-        <item>Cascade Classifier</item>
-        <item>Morphological Processing</item>
-        <item>Neural Network Y.O.L.O.</item>
-        <item>Edge Comparison</item>
+        <item>Vertical Edge Contouring</item>
+        <item>Morphological Transformations</item>
+        <item>Median Center of Moments</item>
     </string-array>
-    <string name="startRecognitionText">Start Recognition</string>
+    <string name="buttonProceed">Proceed</string>
+    <string name="recognitionMode">recognition mode</string>
+    <string name="resourceType">resource type</string>
+    <string name="processingMethod">processing method</string>
 </resources>
