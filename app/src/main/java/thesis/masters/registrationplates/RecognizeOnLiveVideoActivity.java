@@ -1,7 +1,15 @@
 package thesis.masters.registrationplates;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.SparseArray;
@@ -43,6 +51,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
     CheckBox checkBoxOCRActive;
     TextRecognizer textRecognizer;
     CharacterRecognition characterRecognition;
+    private final int CAMERA_PERMISSION_CODE = 333;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,20 +68,60 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
             @Override
             public void onManagerConnected(int status) {
 
-                switch (status)
-                {
+                switch (status) {
                     case BaseLoaderCallback.SUCCESS:
-                        cameraBridgeViewBase.enableView();
+                        if (ContextCompat.checkSelfPermission(RecognizeOnLiveVideoActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                            requestCameraPermission();
+                        } else {
+                            cameraBridgeViewBase.enableView();
+                        }
                         break;
-                    default :
-                         super.onManagerConnected(status);
-                         break;
-
-
+                    default:
+                        super.onManagerConnected(status);
+                        break;
 
                 }
             }
+
         };
+
+
+    }
+
+    private void requestCameraPermission(){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.CAMERA))   {
+            new AlertDialog.Builder(this)
+                    .setTitle("Camera permission needed")
+                    .setMessage("Do You allow Recognizer application to use the camera? This permission is necessary for live recognition mode.")
+                    .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(RecognizeOnLiveVideoActivity.this, new String[]{Manifest.permission.CAMERA},CAMERA_PERMISSION_CODE);
+                        }
+                    })
+                    .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create().show();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},CAMERA_PERMISSION_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                cameraBridgeViewBase.enableView();
+                Toast.makeText(this,"Camera Permission granted",Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(this,"Camera Permission not granted",Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override

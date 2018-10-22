@@ -33,10 +33,30 @@ public class SelectSourceForRecognitionActivity extends AppCompatActivity {
 
     public void goToConfirmRecognitionSelectionActivity(View view){
         Intent intent = new Intent(this, ConfirmRecognitionSelectionActivity.class);
-        String liveOrGallerySelectionText = getRadioButtonValue(this.liveOrGalleryRadioGroup);
-        String videoOrPhotoSelectionText = getRadioButtonValue(this.videoOrPhotoRadioGroup);
 
-        intent.putExtra("spinnerValue", this.recognitionMethodSpinner.getSelectedItem().toString());
+        //enable resources translation START
+        String liveOrGallerySelectionText = getRadioButtonValue(this.liveOrGalleryRadioGroup);
+        if (liveOrGallerySelectionText.equals(getString(R.string.radioButtonLive)))
+            liveOrGallerySelectionText = "LIVE";
+        else
+            liveOrGallerySelectionText = "GALLERY";
+
+        String videoOrPhotoSelectionText = getRadioButtonValue(this.videoOrPhotoRadioGroup);
+        if (videoOrPhotoSelectionText.equals(getString(R.string.radioButtonVideo)))
+            videoOrPhotoSelectionText = "VIDEO";
+        else
+            videoOrPhotoSelectionText = "IMAGE";
+
+        String spinnerValueString = this.recognitionMethodSpinner.getSelectedItem().toString();
+        if (spinnerValueString.equals(getResources().getStringArray(R.array.recognitionMethodsArray)[0]))
+            spinnerValueString = "Vertical Edge Contouring";
+        else if (spinnerValueString.equals(getResources().getStringArray(R.array.recognitionMethodsArray)[1]))
+            spinnerValueString = "Morphological Transformations";
+        else
+            spinnerValueString = "Median Center of Moments";
+        //enable resources translation END
+
+        intent.putExtra("spinnerValue", spinnerValueString);
         intent.putExtra("liveOrGallerySelectionText", liveOrGallerySelectionText);
         intent.putExtra("videoOrPhotoSelectionText", videoOrPhotoSelectionText);
 
@@ -45,18 +65,18 @@ public class SelectSourceForRecognitionActivity extends AppCompatActivity {
 
     }
 
-    public void goToColorDetectionActivity(View view){
+   /* public void goToColorDetectionActivity(View view){
         Intent intent = new Intent(this,DetectColorsActivity.class);
         startActivity(intent);
-    }
+    }*/
 
     private String getRadioButtonValue(RadioGroup radioGroup){
         String radioButtonTextValue = ((RadioButton) findViewById( radioGroup.getCheckedRadioButtonId())).getText().toString();
         return radioButtonTextValue;
     }
 
-    public void goToOcrOnlyActivity(View view){
+    /*public void goToOcrOnlyActivity(View view){
         Intent intent = new Intent(this,OcrOnlyActivity.class);
         startActivity(intent);
-    }
+    }*/
 }

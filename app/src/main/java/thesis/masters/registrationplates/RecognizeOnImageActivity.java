@@ -3,12 +3,19 @@ package thesis.masters.registrationplates;
 
 
 
+import android.Manifest;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +54,13 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     CharacterRecognition characterRecognition;
     ViewAdjuster viewAdjuster;
     PlateDetector plateDetector;
+    private String recognitionMethod;
+    private final int ALL_PERMISSIONS_CODE = 444;
+    private String[] ALL_PERMISSIONS = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA
+    };
 
 
     @Override
@@ -70,13 +84,17 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
         OpenCVLoader.initDebug();
         Bundle extras = getIntent().getExtras();
-        if (extras != null)
+        if (extras != null) {
             this.liveGallerySelection = extras.getString("liveGallerySelection");
-        else
+            this.recognitionMethod = extras.getString("recognitionMethod");
+        }
+        else {
             this.liveGallerySelection = "Gallery";
+            this.recognitionMethod = "Morphological Transformations";
+        }
 
         Button pickImageButton = findViewById(R.id.pickImageButton);
-        if (this.liveGallerySelection.equals("Live"))
+        if (this.liveGallerySelection.equals("LIVE"))
             pickImageButton.setText(R.string.buttonTakeAPhoto);
         else
             pickImageButton.setText(R.string.buttonPickImageFromGallery);
@@ -85,27 +103,89 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
 
 
+    private void requestAllPermissions(){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.CAMERA)
+                || ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                || ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.READ_EXTERNAL_STORAGE))   {
+            new AlertDialog.Builder(this)
+                    .setTitle("Camera and Storage Access permissions needed")
+                    .setMessage("Do You allow Recognizer application to use the camera and the external storage? Those permissions are necessary for live image mode.")
+                    .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(RecognizeOnImageActivity.this, ALL_PERMISSIONS,ALL_PERMISSIONS_CODE);
+                        }
+                    })
+                    .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create().show();
+        } else {
+            ActivityCompat.requestPermissions(this, ALL_PERMISSIONS,ALL_PERMISSIONS_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == ALL_PERMISSIONS_CODE) {
+            if (grantResults.length > 0) {
+                boolean permissions_flag = true;
+                for (int i = 0; i <  grantResults.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED)
+                        permissions_flag = false;
+                }
+                if (permissions_flag) {
+                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                    photoURI = getContentResolver().insert(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(cameraIntent, CAMERA_PHOTO);
+                    Toast.makeText(this,"All permissions granted",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this,"Not all permissions granted",Toast.LENGTH_SHORT).show();
+                }
+            }
+            else {
+                Toast.makeText(this,"Not all permissions granted",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+
 
     public void pickImageFromGallery(View view) {
         switch (this.liveGallerySelection) {
-            case "Gallery":
+            case "GALLERY":
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleryIntent, GALLERY_PICTURE);
                 break;
-            case "Live":
-                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                ContentValues values = new ContentValues();
-                values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
-                photoURI = getContentResolver().insert(
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            case "LIVE":
+                if (ContextCompat.checkSelfPermission(RecognizeOnImageActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
+                        || ContextCompat.checkSelfPermission(RecognizeOnImageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                        || ContextCompat.checkSelfPermission(RecognizeOnImageActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                    requestAllPermissions();
+                } else {
+                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                    photoURI = getContentResolver().insert(
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 
 
-                startActivityForResult(cameraIntent, CAMERA_PHOTO);
+                    startActivityForResult(cameraIntent, CAMERA_PHOTO);
 
 
-                break;
+                    break;
+                }
         }
     }
 
@@ -172,8 +252,17 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
         if (this.imageBitmap != null)
         {
-
-            //this.recognizedBitmap = plateDetector.testMethod(this.imageBitmap);
+            switch (this.recognitionMethod) {
+                case "Morphological Transformations":
+                    this.recognizedBitmap = plateDetector.morphologicalTransformationsRecognitionMethod(this.imageBitmap);
+                    break;
+                case "Median Center of Moments":
+                    this.recognizedBitmap = plateDetector.medianCenterOfMomentRecognitionMethod(this.imageBitmap);
+                    break;
+                case "Vertical Edge Contouring":
+                    this.recognizedBitmap = plateDetector.edgeContourRecognitionMethod(this.imageBitmap);
+                    break;
+            }
             imageView.setImageBitmap(this.recognizedBitmap);
             int recognizedPlates = this.characterRecognition.getTextFromImage(imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4);
             this.viewAdjuster.showPlateImageViewsAfterRecognition(recognizedPlates, this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);

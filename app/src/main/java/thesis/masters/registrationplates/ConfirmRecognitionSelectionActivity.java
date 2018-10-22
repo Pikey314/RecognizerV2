@@ -12,13 +12,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
     private TextView confirmationOfSelectionTextView;
     private Button selectResourceButton;
+    private SeekBar distanceFromPlateSeekBar;
+    private Switch oldPlatesSwitch;
+    private RadioGroup amountOfPlatesRadioGroup;
     private String selection = null;
-    String liveOrGallery;
+    private String liveOrGallery;
+    private String recognitionMethod;
+
 
 
     /*private ImageView resourceForRecognitionImageView;
@@ -33,13 +42,16 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_confirm_recognition_selection);
         this.confirmationOfSelectionTextView = (TextView) findViewById(R.id.confirmationOfRecognitionSelectionTextView);
         this.selectResourceButton = (Button) findViewById(R.id.selectResourceButton);
+        this.distanceFromPlateSeekBar = findViewById(R.id.plateDistanceSeekBar);
+        this.oldPlatesSwitch = findViewById(R.id.oldPlatesSwitch);
+        this.amountOfPlatesRadioGroup = findViewById(R.id.amountOfPlatesRadioGroup);
         //this.resourceForRecognitionImageView = (ImageView) findViewById(R.id.resourceForRecognitionImageView);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             liveOrGallery = extras.getString("liveOrGallerySelectionText");
             String videOrPhoto = extras.getString("videoOrPhotoSelectionText");
-            String recognitionMethod = extras.getString("spinnerValue");
-            this.confirmationOfSelectionTextView.setText("Increase accuracy for " + recognitionMethod + " method");
+            this.recognitionMethod = extras.getString("spinnerValue");
+            this.confirmationOfSelectionTextView.setText("Increase accuracy for " + this.recognitionMethod + " method");
             switch (liveOrGallery) {
                 case "LIVE":
                     if (videOrPhoto.equals("VIDEO")) {
@@ -71,24 +83,35 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
 
     public void pickResourceForRecognitionWithButton(View view) {
         if (this.selection != null) {
+            //distanceFromPlate = 0,1,2,3,4
+            int distanceFromPlate = this.distanceFromPlateSeekBar.getProgress();
+            //oldPlatesMode = false/true
+            boolean oldPlatesMode = this.oldPlatesSwitch.isChecked();
+            //amountOfPlates = ONE TWO
+            String amountOfPlates = getRadioButtonValue(this.amountOfPlatesRadioGroup);
             switch (this.selection) {
                 case "LiveVideo":
                     Log.v("Button Selection", "LiveVideo");
-                    recognizeOnLiveVideoActivity();
+                    recognizeOnLiveVideoActivity(distanceFromPlate,oldPlatesMode,amountOfPlates);
                     break;
                 case "Image":
                     Log.v("Button Selection", "GalleryPhoto");
-                    recognizeOnImageActivity();
+                    recognizeOnImageActivity(distanceFromPlate,oldPlatesMode,amountOfPlates);
                     break;
                 case "GalleryVideo":
                     Log.v("Button Selection", "GalleryVideo");
-                    recognizeOnPreRecordedVideoActivity();
+                    recognizeOnPreRecordedVideoActivity(distanceFromPlate,oldPlatesMode,amountOfPlates);
                     break;
                 default:
                     Log.v("Problem with code", "Push button problem");
                     break;
             }
         }
+    }
+
+    private String getRadioButtonValue(RadioGroup radioGroup){
+        String radioButtonTextValue = ((RadioButton) findViewById( radioGroup.getCheckedRadioButtonId())).getText().toString();
+        return radioButtonTextValue;
     }
 
     /*public void chooseImageFromGallery() {
@@ -111,19 +134,31 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         }
     }*/
 
-    public void recognizeOnLiveVideoActivity() {
+    public void recognizeOnLiveVideoActivity(int distanceFromPlate ,boolean oldPlatesMode, String amountOfPlates) {
         Intent recognizeOnLiveVideoIntent = new Intent(this, RecognizeOnLiveVideoActivity.class);
+        recognizeOnLiveVideoIntent.putExtra("recognitionMethod",this.recognitionMethod);
+        recognizeOnLiveVideoIntent.putExtra("distanceFromPlate",distanceFromPlate);
+        recognizeOnLiveVideoIntent.putExtra("oldPlatesMode",oldPlatesMode);
+        recognizeOnLiveVideoIntent.putExtra("amountOfPlates",amountOfPlates);
         startActivity(recognizeOnLiveVideoIntent);
     }
 
-    public void recognizeOnImageActivity() {
+    public void recognizeOnImageActivity(int distanceFromPlate ,boolean oldPlatesMode, String amountOfPlates) {
         Intent recognizeOnImageIntent = new Intent(this, RecognizeOnImageActivity.class);
+        recognizeOnImageIntent.putExtra("recognitionMethod",this.recognitionMethod);
         recognizeOnImageIntent.putExtra("liveGallerySelection",liveOrGallery);
+        recognizeOnImageIntent.putExtra("distanceFromPlate",distanceFromPlate);
+        recognizeOnImageIntent.putExtra("oldPlatesMode",oldPlatesMode);
+        recognizeOnImageIntent.putExtra("amountOfPlates",amountOfPlates);
         startActivity(recognizeOnImageIntent);
     }
 
-    public void recognizeOnPreRecordedVideoActivity() {
+    public void recognizeOnPreRecordedVideoActivity(int distanceFromPlate ,boolean oldPlatesMode, String amountOfPlates) {
         Intent recognizeOnPreRecordedVideoIntent = new Intent(this, RecognizeOnPreRecordedVideoActivity.class);
+        recognizeOnPreRecordedVideoIntent.putExtra("recognitionMethod",this.recognitionMethod);
+        recognizeOnPreRecordedVideoIntent.putExtra("distanceFromPlate",distanceFromPlate);
+        recognizeOnPreRecordedVideoIntent.putExtra("oldPlatesMode",oldPlatesMode);
+        recognizeOnPreRecordedVideoIntent.putExtra("amountOfPlates",amountOfPlates);
         startActivity(recognizeOnPreRecordedVideoIntent);
     }
 
