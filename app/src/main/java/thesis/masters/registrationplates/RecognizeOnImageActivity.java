@@ -48,6 +48,9 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     Uri photoURI;
     Bitmap imageBitmap ,recognizedBitmap;
     String liveGallerySelection;
+    private boolean oldPlatesMode;
+    private int numberOfPlates;
+    private int distanceFromPlate;
     //String mCurrentPhotoPath;
     TextView textViewRecognitionOutput, textViewRecognitionOutput2, textViewRecognitionOutput3, textViewRecognitionOutput4;
     ImageView plateImageView,plateImageView2,plateImageView3,plateImageView4;
@@ -87,10 +90,12 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         if (extras != null) {
             this.liveGallerySelection = extras.getString("liveGallerySelection");
             this.recognitionMethod = extras.getString("recognitionMethod");
+            this.distanceFromPlate = extras.getInt("distanceFromPlate");
+            this.oldPlatesMode = extras.getBoolean("oldPlatesMode");
+            this.numberOfPlates = extras.getInt("amountOfPlates");
         }
         else {
-            this.liveGallerySelection = "Gallery";
-            this.recognitionMethod = "Morphological Transformations";
+            throw new RuntimeException("Problem with settings");
         }
 
         Button pickImageButton = findViewById(R.id.pickImageButton);
@@ -140,8 +145,8 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                 if (permissions_flag) {
                     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                    values.put(MediaStore.Images.Media.TITLE, "Recognizer App Photo");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "Live image recognition resource photo");
                     photoURI = getContentResolver().insert(
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                     cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
@@ -174,13 +179,11 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                 } else {
                     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.TITLE, "New Picture");
-                    values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+                    values.put(MediaStore.Images.Media.TITLE, "Recognizer App Photo");
+                    values.put(MediaStore.Images.Media.DESCRIPTION, "Live image recognition resource photo");
                     photoURI = getContentResolver().insert(
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                     cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-
-
                     startActivityForResult(cameraIntent, CAMERA_PHOTO);
 
 
@@ -254,7 +257,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         {
             switch (this.recognitionMethod) {
                 case "Morphological Transformations":
-                    this.recognizedBitmap = plateDetector.morphologicalTransformationsRecognitionMethod(this.imageBitmap);
+                    this.recognizedBitmap = plateDetector.morphologicalTransformationsRecognitionMethod(this.imageBitmap,this.distanceFromPlate);
                     break;
                 case "Median Center of Moments":
                     this.recognizedBitmap = plateDetector.medianCenterOfMomentRecognitionMethod(this.imageBitmap);

@@ -97,8 +97,8 @@ public class PlateDetector {
 
 
 
-    // DODAC PAREMTRY I MENU USTAWIEN -> h = daleko/sredni/blisko,  -> czarna tablica czy biala w if
-    public Bitmap morphologicalTransformationsRecognitionMethod(Bitmap bitmap){
+    // DONE
+    public Bitmap morphologicalTransformationsRecognitionMethod(Bitmap bitmap, int distanceFromPlate){
 
         int initialImageBitmapHeight = bitmap.getHeight();
         int initialImageBitmapWidth = bitmap.getWidth();
@@ -108,9 +108,7 @@ public class PlateDetector {
         Mat higherContrastMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
         Mat matToReturn = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
 
-        /* Mat imageMat4 = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
 
-        Mat tmp = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));*/
 
         Bitmap copyBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
         Utils.bitmapToMat(copyBitmap, initialImageMat);
@@ -119,57 +117,73 @@ public class PlateDetector {
 
         Imgproc.equalizeHist(grayScaleMat,higherContrastMat);
 
+        int initialMatHeight = higherContrastMat.rows();
+        //distanceFromPlate CLOSE 0,1,2,3,4 FAR
+        //moj obrazek uznaje ze jest 1 -> h = 13
         //KERNEL START
         //Wielkość zależy od wysokości tablicy rejestracyjnej(h) -> kernel = h/5
         //TUTAJ POWINIENEM DOROBIC TO ABY UZYTKOWNIK MOGL WYBRAC CZY REJSTRACJA DALEKO/SREDNIO/BLISKO
-        int h = initialImageBitmapHeight/20;
-        int kernelWidth = h*2;
-        int kernelHeight = h/5;
-        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelWidth, kernelHeight));
-        //KERLEN END
+        int h;
+        switch (distanceFromPlate) {
+            case 0:
+                h = initialMatHeight/9;
+                break;
+            case 1:
+                h = initialMatHeight/13;
+                break;
+            case 2:
+                h = initialMatHeight/17;
+                break;
+            case 3:
+                h = initialMatHeight/21;
+                break;
+            default:
+                h = initialMatHeight/25;
+                break;
 
+        }
+
+
+
+        int kernelSize = h/5;
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelSize, kernelSize));
         Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_TOPHAT,kernel);
         Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_BLACKHAT,kernel);
 
-        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h*4, 1));
-
+        kernelSize = h*4;
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelSize, 1));
         Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_CLOSE,kernel);
 
-        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, h/2));
-
+        kernelSize = h/2;
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, kernelSize));
         Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_OPEN,kernel);
 
-        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h*2, 1));
-
+        kernelSize = h*2;
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelSize, 1));
         Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_OPEN,kernel);
 
+        //TUTAJ OBCZAIC CZY 20 to odpowiednia wartosc
         double maxPixelValue = Core.minMaxLoc(higherContrastMat).maxVal;
-
-        //Toast.makeText(context,Double.toString(maxPixelValue), Toast.LENGTH_LONG).show();
-
         Imgproc.threshold(higherContrastMat,higherContrastMat,maxPixelValue-20,255,Imgproc.THRESH_BINARY);
 
-        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h, h/2));
-
+        //TUTAJ RYZYKOWNY KERNEL
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h*1.25, h/3));
         Imgproc.dilate(higherContrastMat,higherContrastMat,kernel);
 
         //kontury
 
         List<MatOfPoint> contours = new ArrayList<>();
-
         Imgproc.findContours(higherContrastMat,contours,new Mat(),Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
 
         Utils.bitmapToMat(bitmap,matToReturn);
 
-        int contourThickness = bitmap.getHeight()/100;
-
+        int contourThickness = bitmap.getHeight()/150;
         for (int i = 0; i < contours.size(); i++) {
             Imgproc.drawContours(matToReturn, contours, i, new Scalar(0, 0, 255), contourThickness);
         }
 
 
         Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
-
         Utils.matToBitmap(matToReturn,bitmapToReturn);
 
         return bitmapToReturn;
@@ -347,3 +361,109 @@ public class PlateDetector {
     }*/
 
 }
+
+
+
+
+
+/* OLD VERISON
+    // DODAC PAREMTRY I MENU USTAWIEN -> h = daleko/sredni/blisko,  -> czarna tablica czy biala w if
+
+        int initialImageBitmapHeight = bitmap.getHeight();
+        int initialImageBitmapWidth = bitmap.getWidth();
+
+        Mat initialImageMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat grayScaleMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat higherContrastMat = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+        Mat matToReturn = new Mat(initialImageBitmapHeight, initialImageBitmapWidth, CvType.CV_8U, new Scalar(4));
+
+
+
+        Bitmap copyBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Utils.bitmapToMat(copyBitmap, initialImageMat);
+
+        Imgproc.cvtColor(initialImageMat, grayScaleMat, Imgproc.COLOR_RGB2GRAY, 8);
+
+        Imgproc.equalizeHist(grayScaleMat,higherContrastMat);
+
+        //distanceFromPlate CLOSE 0,1,2,3,4 FAR
+        //moj obrazek uznaje ze jest 1 -> h = 13
+        //KERNEL START
+        //Wielkość zależy od wysokości tablicy rejestracyjnej(h) -> kernel = h/5
+        //TUTAJ POWINIENEM DOROBIC TO ABY UZYTKOWNIK MOGL WYBRAC CZY REJSTRACJA DALEKO/SREDNIO/BLISKO
+        int h;
+        switch (distanceFromPlate) {
+            case 0:
+                h = initialImageBitmapHeight/9;
+                break;
+            case 1:
+                h = initialImageBitmapHeight/13;
+                break;
+            case 2:
+                h = initialImageBitmapHeight/17;
+                break;
+            case 3:
+                h = initialImageBitmapHeight/21;
+                break;
+            default:
+                h = initialImageBitmapHeight/25;
+                break;
+
+        }
+
+
+        //int h = initialImageBitmapHeight/20;
+        int kernelWidth = h*2;
+        int kernelHeight = h/5;
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelWidth, kernelHeight));
+        //KERLEN END
+
+        Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_TOPHAT,kernel);
+        Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_BLACKHAT,kernel);
+
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h*4, 1));
+
+        Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_CLOSE,kernel);
+
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(1, h/2));
+
+        Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_OPEN,kernel);
+
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h*2, 1));
+
+        Imgproc.morphologyEx(higherContrastMat,higherContrastMat,Imgproc.MORPH_OPEN,kernel);
+
+        double maxPixelValue = Core.minMaxLoc(higherContrastMat).maxVal;
+
+        //Toast.makeText(context,Double.toString(maxPixelValue), Toast.LENGTH_LONG).show();
+
+        Imgproc.threshold(higherContrastMat,higherContrastMat,maxPixelValue-20,255,Imgproc.THRESH_BINARY);
+
+        kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(h, h/2));
+
+        Imgproc.dilate(higherContrastMat,higherContrastMat,kernel);
+
+        //kontury
+
+        List<MatOfPoint> contours = new ArrayList<>();
+
+        Imgproc.findContours(higherContrastMat,contours,new Mat(),Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+
+        Utils.bitmapToMat(bitmap,matToReturn);
+
+        int contourThickness = bitmap.getHeight()/100;
+
+        for (int i = 0; i < contours.size(); i++) {
+            Imgproc.drawContours(matToReturn, contours, i, new Scalar(0, 0, 255), contourThickness);
+        }
+
+
+        Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
+
+        Utils.matToBitmap(matToReturn,bitmapToReturn);
+
+        return bitmapToReturn;
+
+
+
+    }*/

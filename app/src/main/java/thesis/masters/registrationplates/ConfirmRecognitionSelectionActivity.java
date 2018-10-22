@@ -87,8 +87,8 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
             int distanceFromPlate = this.distanceFromPlateSeekBar.getProgress();
             //oldPlatesMode = false/true
             boolean oldPlatesMode = this.oldPlatesSwitch.isChecked();
-            //amountOfPlates = ONE TWO
-            String amountOfPlates = getRadioButtonValue(this.amountOfPlatesRadioGroup);
+            //amountOfPlates = 1,2
+            int amountOfPlates = getRadioButtonValue(this.amountOfPlatesRadioGroup);
             switch (this.selection) {
                 case "LiveVideo":
                     Log.v("Button Selection", "LiveVideo");
@@ -109,9 +109,12 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         }
     }
 
-    private String getRadioButtonValue(RadioGroup radioGroup){
+    private int getRadioButtonValue(RadioGroup radioGroup){
         String radioButtonTextValue = ((RadioButton) findViewById( radioGroup.getCheckedRadioButtonId())).getText().toString();
-        return radioButtonTextValue;
+        if (radioButtonTextValue.equals(getString(R.string.one)))
+            return 1;
+        else
+            return 2;
     }
 
     /*public void chooseImageFromGallery() {
@@ -134,7 +137,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         }
     }*/
 
-    public void recognizeOnLiveVideoActivity(int distanceFromPlate ,boolean oldPlatesMode, String amountOfPlates) {
+    public void recognizeOnLiveVideoActivity(int distanceFromPlate ,boolean oldPlatesMode, int amountOfPlates) {
         Intent recognizeOnLiveVideoIntent = new Intent(this, RecognizeOnLiveVideoActivity.class);
         recognizeOnLiveVideoIntent.putExtra("recognitionMethod",this.recognitionMethod);
         recognizeOnLiveVideoIntent.putExtra("distanceFromPlate",distanceFromPlate);
@@ -143,7 +146,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         startActivity(recognizeOnLiveVideoIntent);
     }
 
-    public void recognizeOnImageActivity(int distanceFromPlate ,boolean oldPlatesMode, String amountOfPlates) {
+    public void recognizeOnImageActivity(int distanceFromPlate ,boolean oldPlatesMode, int amountOfPlates) {
         Intent recognizeOnImageIntent = new Intent(this, RecognizeOnImageActivity.class);
         recognizeOnImageIntent.putExtra("recognitionMethod",this.recognitionMethod);
         recognizeOnImageIntent.putExtra("liveGallerySelection",liveOrGallery);
@@ -153,7 +156,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         startActivity(recognizeOnImageIntent);
     }
 
-    public void recognizeOnPreRecordedVideoActivity(int distanceFromPlate ,boolean oldPlatesMode, String amountOfPlates) {
+    public void recognizeOnPreRecordedVideoActivity(int distanceFromPlate ,boolean oldPlatesMode, int amountOfPlates) {
         Intent recognizeOnPreRecordedVideoIntent = new Intent(this, RecognizeOnPreRecordedVideoActivity.class);
         recognizeOnPreRecordedVideoIntent.putExtra("recognitionMethod",this.recognitionMethod);
         recognizeOnPreRecordedVideoIntent.putExtra("distanceFromPlate",distanceFromPlate);

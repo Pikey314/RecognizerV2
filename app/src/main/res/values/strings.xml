@@ -27,7 +27,7 @@
     <string name="startRecognition">Start Recognition</string>
     <string name="setDistanceFromTheCar">set distance from the car</string>
     <string name="oldPates">old plates mode</string>
-    <string name="amountOfPlates">amount of plates for parallel recognition</string>
+    <string name="amountOfPlates">number of plates for parallel recognition</string>
     <string name="one">ONE</string>
     <string name="two">TWO</string>
 </resources>
