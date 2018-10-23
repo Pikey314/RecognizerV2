@@ -260,10 +260,10 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                     this.recognizedBitmap = plateDetector.morphologicalTransformationsRecognitionMethod(this.imageBitmap,this.distanceFromPlate);
                     break;
                 case "Median Center of Moments":
-                    this.recognizedBitmap = plateDetector.medianCenterOfMomentRecognitionMethod(this.imageBitmap);
+                    this.recognizedBitmap = plateDetector.medianCenterOfMomentRecognitionMethod(this.imageBitmap,this.distanceFromPlate);
                     break;
                 case "Vertical Edge Contouring":
-                    this.recognizedBitmap = plateDetector.edgeContourRecognitionMethod(this.imageBitmap);
+                    this.recognizedBitmap = plateDetector.edgeContourRecognitionMethod(this.imageBitmap,this.distanceFromPlate);
                     break;
             }
             imageView.setImageBitmap(this.recognizedBitmap);
