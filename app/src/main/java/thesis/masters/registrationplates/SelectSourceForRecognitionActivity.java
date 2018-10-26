@@ -32,7 +32,7 @@ public class SelectSourceForRecognitionActivity extends AppCompatActivity {
     }
 
     public void goToConfirmRecognitionSelectionActivity(View view){
-        Intent intent = new Intent(this, ConfirmRecognitionSelectionActivity.class);
+        Intent intent;
 
         //enable resources translation START
         String liveOrGallerySelectionText = getRadioButtonValue(this.liveOrGalleryRadioGroup);
@@ -56,9 +56,15 @@ public class SelectSourceForRecognitionActivity extends AppCompatActivity {
             spinnerValueString = "Median Center of Moments";
         //enable resources translation END
 
-        intent.putExtra("spinnerValue", spinnerValueString);
-        intent.putExtra("liveOrGallerySelectionText", liveOrGallerySelectionText);
-        intent.putExtra("videoOrPhotoSelectionText", videoOrPhotoSelectionText);
+        if (liveOrGallerySelectionText.equals("LIVE") && videoOrPhotoSelectionText.equals("VIDEO")) {
+            intent = new Intent(this, RecognizeOnLiveVideoActivity.class);
+            intent.putExtra("spinnerValue", spinnerValueString);
+        } else {
+            intent = new Intent(this, ConfirmRecognitionSelectionActivity.class);
+            intent.putExtra("spinnerValue", spinnerValueString);
+            intent.putExtra("liveOrGallerySelectionText", liveOrGallerySelectionText);
+            intent.putExtra("videoOrPhotoSelectionText", videoOrPhotoSelectionText);
+        }
 
         startActivity(intent);
 

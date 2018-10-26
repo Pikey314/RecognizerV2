@@ -32,114 +32,133 @@
         android:textStyle="bold"
         android:textSize="20dp" />
 
+    <TextView
+        android:id="@+id/oldPlatesModeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@id/plateStaticVideoImageView"
+        android:textSize="15dp"
+        android:textStyle="italic"
+        android:layout_marginTop="3dp"
+        android:layout_marginRight="15dp"
+        android:textColor="@android:color/holo_red_dark"
+        android:text="OLD PLATES MODE"/>
+
+    <TextView
+        android:id="@+id/OCRmodeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/plateStaticVideoImageView"
+        android:textSize="15dp"
+        android:textStyle="italic"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="25dp"
+        android:textColor="@android:color/holo_red_dark"
+        android:text="OCR MODE"/>
+
+    <TextView
+        android:id="@+id/ocrSwithcStartTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/OCRmodeTextView"
+        android:layout_toRightOf="@id/plateStaticVideoImageView"
+        android:textSize="15dp"
+        android:textStyle="italic"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="20dp"
+        android:textColor="@android:color/holo_red_dark"
+        android:text="OFF"/>
+
     <Switch
         android:id="@+id/enableOCRLiveVideoSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/plateStaticVideoImageView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"/>
+        android:layout_below="@id/OCRmodeTextView"
+        android:layout_marginTop="2dp"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/ocrSwithcStartTextView"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/plateStaticVideoImageView"
-        android:layout_toLeftOf="@id/enableOCRLiveVideoSwitch"
-        android:textSize="15dp"
-        android:textStyle="italic"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="5dp"
-        android:textColor="@android:color/holo_orange_light"
-        android:text="OCR OFF"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/plateStaticVideoImageView"
+        android:layout_below="@id/oldPlatesModeTextView"
         android:layout_toRightOf="@id/enableOCRLiveVideoSwitch"
         android:textSize="15dp"
         android:textStyle="italic"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:layout_marginLeft="5dp"
-        android:textColor="@android:color/holo_orange_light"
-        android:text="OCR ON"/>
+        android:textColor="@android:color/holo_red_dark"
+        android:text="ON"/>
 
     <SeekBar
         android:id="@+id/plateDistanceSeekBarVideo"
-        android:layout_width="250dp"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:max="4"
         android:layout_marginBottom="15dp"
         android:layout_centerHorizontal="true"
-        android:layout_above="@id/changeDistanceFromCarTextView"
+        android:layout_alignParentBottom="true"
         />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/changeDistanceFromCarTextView"
+        android:layout_alignParentBottom="true"
         android:layout_toRightOf="@id/plateDistanceSeekBarVideo"
         android:textSize="15dp"
         android:textStyle="italic"
         android:layout_marginBottom="13dp"
-        android:textColor="@android:color/holo_orange_light"
+        android:textColor="@android:color/holo_red_dark"
         android:text="FAR"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/changeDistanceFromCarTextView"
+        android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@id/plateDistanceSeekBarVideo"
         android:textSize="15dp"
         android:textStyle="italic"
         android:layout_marginBottom="13dp"
-        android:textColor="@android:color/holo_orange_light"
+        android:textColor="@android:color/holo_red_dark"
         android:text="CLOSE"/>
 
     <TextView
-        android:id="@+id/changeDistanceFromCarTextView"
+        android:id="@+id/oldPlatesSwitchStartTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="5dp"
-        android:textSize="25dp"
-        android:textStyle="bold"
-        android:textColor="@android:color/holo_orange_light"
-        android:text="Change distance from a car"/>
+        android:layout_below="@id/oldPlatesModeTextView"
+        android:layout_toLeftOf="@id/plateStaticVideoImageView"
+        android:textSize="15dp"
+        android:textStyle="italic"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="20dp"
+        android:textColor="@android:color/holo_red_dark"
+        android:text="ON"/>
 
     <Switch
         android:id="@+id/oldPlatesSwitchVideo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/enableOCRLiveVideoSwitch"
-        android:layout_marginTop="5dp"
-        android:layout_centerHorizontal="true"
-        />
+        android:layout_below="@+id/oldPlatesModeTextView"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="5dp"
+        android:layout_toLeftOf="@+id/oldPlatesSwitchStartTextView"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/enableOCRLiveVideoSwitch"
+        android:layout_below="@id/oldPlatesModeTextView"
         android:layout_toLeftOf="@id/oldPlatesSwitchVideo"
         android:textSize="15dp"
         android:textStyle="italic"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:layout_marginRight="5dp"
-        android:textColor="@android:color/holo_orange_light"
-        android:text="OLD PLATES ON"/>
+        android:textColor="@android:color/holo_red_dark"
+        android:text="OFF"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/enableOCRLiveVideoSwitch"
-        android:layout_toRightOf="@id/oldPlatesSwitchVideo"
-        android:textSize="15dp"
-        android:textStyle="italic"
-        android:layout_marginTop="12dp"
-        android:layout_marginLeft="5dp"
-        android:textColor="@android:color/holo_orange_light"
-        android:text="OLD PLATES OFF"/>
+
 
 
 

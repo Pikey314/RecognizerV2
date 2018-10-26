@@ -30,4 +30,10 @@
     <string name="amountOfPlates">number of plates for parallel recognition</string>
     <string name="one">ONE</string>
     <string name="two">TWO</string>
+    <string name="carDistanceIncreased">Distance from the car increased</string>
+    <string name="carDistanceReduced">Distance from the car reduced</string>
+    <string name="ocrOn">License plate characters recognition on</string>
+    <string name="ocrOff">License plate characters recognition off</string>
+    <string name="oldPlatesModeOn">Old license plates recognition activated</string>
+    <string name="oldPlatesModeOff">Old license plates recognition disactivated</string>
 </resources>
