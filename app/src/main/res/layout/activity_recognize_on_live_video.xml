@@ -41,6 +41,7 @@
         android:layout_marginTop="10dp"/>
 
     <TextView
+        android:id="@+id/ocrOffTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/plateStaticVideoImageView"
@@ -53,6 +54,7 @@
         android:text="OCR OFF"/>
 
     <TextView
+        android:id="@+id/ocrOnTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/plateStaticVideoImageView"
@@ -75,6 +77,7 @@
         />
 
     <TextView
+        android:id="@+id/plateDistanceFarTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/changeDistanceFromCarTextView"
@@ -86,6 +89,7 @@
         android:text="FAR"/>
 
     <TextView
+        android:id="@+id/plateDistanceCloseTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/changeDistanceFromCarTextView"
@@ -118,6 +122,7 @@
         />
 
     <TextView
+        android:id="@+id/oldPlatesOnTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/enableOCRLiveVideoSwitch"
@@ -130,6 +135,7 @@
         android:text="OLD PLATES ON"/>
 
     <TextView
+        android:id="@+id/oldPlatesOffTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/enableOCRLiveVideoSwitch"

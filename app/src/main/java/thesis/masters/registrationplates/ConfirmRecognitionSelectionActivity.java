@@ -11,12 +11,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
     private TextView confirmationOfSelectionTextView;
@@ -44,6 +46,7 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
         this.selectResourceButton = (Button) findViewById(R.id.selectResourceButton);
         this.distanceFromPlateSeekBar = findViewById(R.id.plateDistanceSeekBar);
         this.oldPlatesSwitch = findViewById(R.id.oldPlatesSwitch);
+
         this.amountOfPlatesRadioGroup = findViewById(R.id.amountOfPlatesRadioGroup);
         //this.resourceForRecognitionImageView = (ImageView) findViewById(R.id.resourceForRecognitionImageView);
         Bundle extras = getIntent().getExtras();
@@ -79,6 +82,31 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
                     break;
             }
         }
+        this.oldPlatesSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (!recognitionMethod.equals("Morphological Transformations")) {
+                    if (b)
+                        Toast.makeText(getApplicationContext(),"Old plates mode is supported by Morphological Processing.\nSwitching method to Morphological Transformations.",Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(getApplicationContext(),"Restoring settings.",Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        });
+        this.amountOfPlatesRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if (!recognitionMethod.equals("Morphological Transformations")) {
+                    if (i == R.id.twoPlatesRadioButton)
+                        Toast.makeText(getApplicationContext(),"Higher number of plates is supported by Morphological Processing.\nSwitching method to Morphological Transformations.",Toast.LENGTH_LONG).show();
+                    else
+                        Toast.makeText(getApplicationContext(),"Restoring settings.",Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
     }
 
     public void pickResourceForRecognitionWithButton(View view) {
@@ -157,12 +185,17 @@ public class ConfirmRecognitionSelectionActivity extends AppCompatActivity {
     }
 
     public void recognizeOnPreRecordedVideoActivity(int distanceFromPlate ,boolean oldPlatesMode, int amountOfPlates) {
-        Intent recognizeOnPreRecordedVideoIntent = new Intent(this, RecognizeOnPreRecordedVideoActivity.class);
+        //****************DO NOT REMOVE THIS CODE***************
+
+        /*Intent recognizeOnPreRecordedVideoIntent = new Intent(this, RecognizeOnPreRecordedVideoActivity.class);
         recognizeOnPreRecordedVideoIntent.putExtra("recognitionMethod",this.recognitionMethod);
         recognizeOnPreRecordedVideoIntent.putExtra("distanceFromPlate",distanceFromPlate);
         recognizeOnPreRecordedVideoIntent.putExtra("oldPlatesMode",oldPlatesMode);
         recognizeOnPreRecordedVideoIntent.putExtra("amountOfPlates",amountOfPlates);
-        startActivity(recognizeOnPreRecordedVideoIntent);
+        startActivity(recognizeOnPreRecordedVideoIntent);*/
+        //****************DO NOT REMOVE THIS CODE***************
+
+        Toast.makeText(this,"Gallery video recognition disabled in the current version of application",Toast.LENGTH_LONG).show();
     }
 
 

@@ -166,6 +166,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
 
     public void pickImageFromGallery(View view) {
+
         switch (this.liveGallerySelection) {
             case "GALLERY":
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -197,6 +198,8 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         this.viewAdjuster.hideAllPlateImageViews(this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);
         this.viewAdjuster.hideAllPlateOutputTextViews(this.textViewRecognitionOutput,this.textViewRecognitionOutput2 ,this.textViewRecognitionOutput3 ,this.textViewRecognitionOutput4);
+
+        findViewById(R.id.recognizeImageButton).setVisibility(View.VISIBLE);
 
         if (data != null && resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
             this.imageURI = data.getData();
@@ -255,22 +258,28 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
         if (this.imageBitmap != null)
         {
-            switch (this.recognitionMethod) {
-                case "Morphological Transformations":
-                    this.recognizedBitmap = plateDetector.morphologicalTransformationsRecognitionMethod(this.imageBitmap,this.distanceFromPlate);
-                    break;
-                case "Median Center of Moments":
-                    this.recognizedBitmap = plateDetector.medianCenterOfMomentRecognitionMethod(this.imageBitmap,this.distanceFromPlate);
-                    break;
-                case "Vertical Edge Contouring":
-                    this.recognizedBitmap = plateDetector.edgeContourRecognitionMethod(this.imageBitmap,this.distanceFromPlate);
-                    break;
+            if (this.oldPlatesMode || this.numberOfPlates > 1)
+                this.recognizedBitmap = plateDetector.morphologicalTransformationsRecognitionMethod(this.imageBitmap,this.distanceFromPlate);
+            else {
+                switch (this.recognitionMethod) {
+                    case "Morphological Transformations":
+                        this.recognizedBitmap = plateDetector.morphologicalTransformationsRecognitionMethod(this.imageBitmap, this.distanceFromPlate);
+                        break;
+                    case "Median Center of Moments":
+                        this.recognizedBitmap = plateDetector.medianCenterOfMomentRecognitionMethod(this.imageBitmap, this.distanceFromPlate);
+                        break;
+                    case "Vertical Edge Contouring":
+                        this.recognizedBitmap = plateDetector.edgeContourRecognitionMethod(this.imageBitmap, this.distanceFromPlate);
+                        break;
+                }
             }
             imageView.setImageBitmap(this.recognizedBitmap);
-            int recognizedPlates = this.characterRecognition.getTextFromImage(imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4);
+            int recognizedPlates = this.characterRecognition.getTextFromImage(imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4,this.numberOfPlates);
             this.viewAdjuster.showPlateImageViewsAfterRecognition(recognizedPlates, this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);
+            findViewById(R.id.recognizeImageButton).setVisibility(View.INVISIBLE);
 
         }
+
     }
 }
 

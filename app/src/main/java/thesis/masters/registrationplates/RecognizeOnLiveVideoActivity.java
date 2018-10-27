@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -83,11 +84,11 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (checked) {
-                    Toast.makeText(getApplicationContext(), getString(R.string.oldPlatesModeOn), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.oldPlatesModeOn), Toast.LENGTH_LONG).show();
                     oldPlatesMode = true;
                     plateImageView.setVisibility(View.VISIBLE);
                 } else {
-                    Toast.makeText(getApplicationContext(), getString(R.string.oldPlatesModeOff), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.oldPlatesModeOff) + " " + recognitionMethod + " method.", Toast.LENGTH_LONG).show();
                     oldPlatesMode = false;
                 }
             }
@@ -113,6 +114,11 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             this.recognitionMethod = extras.getString("spinnerValue");
+            if (this.recognitionMethod.equals("Morphological Transformations")) {
+                this.switchOldPlates.setChecked(true);
+                this.switchOldPlates.setClickable(false);
+
+            }
         } else {
             throw new RuntimeException("Problem with settings");
         }

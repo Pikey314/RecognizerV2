@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/select_source_for_recognition_activity_landscape_background"
+    tools:context=".SelectSourceForRecognitionActivity">
+
+
+
+    <Spinner
+        android:id="@+id/recognitionMethodSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/recognitionMethodTextView"
+        android:layout_marginTop="20dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textAlignment="center"/>
+
+
+    <Button
+        android:id="@+id/startRecognitionButton"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:background="@android:color/black"
+        android:text="@string/buttonProceed"
+        android:textSize="30dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/holo_blue_bright"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="10dp"
+        android:onClick="goToConfirmRecognitionSelectionActivity"/>
+
+    <TextView
+        android:id="@+id/liveOrPrerecordedTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="28dp"
+        android:textAlignment="center"
+        android:fontFamily="@font/speed_font"
+        android:textColor="@android:color/black"
+        android:text="@string/recognitionMode"/>
+
+    <RadioGroup
+        android:id="@+id/liveOrPrerecordedRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/liveOrPrerecordedTextView"
+
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/liveRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingRight="100dp"
+            android:checked="true"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:buttonTint= "@android:color/holo_red_dark"
+            android:text="@string/radioButtonLive" />
+
+        <RadioButton
+            android:id="@+id/galleryRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingRight="10dp"
+            android:textColor="@android:color/black"
+            android:buttonTint= "@android:color/holo_red_dark"
+            android:textStyle="bold"
+            android:text="@string/radioButtonGallery" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/videoOrPhotoTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="28dp"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/speed_font"
+        app:layout_constraintTop_toBottomOf="@+id/liveOrPrerecordedRadioGroup"
+        android:text="@string/resourceType"/>
+
+    <RadioGroup
+        android:id="@+id/videoOrPhotoRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/videoOrPhotoTextView"
+
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/videoRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingRight="100dp"
+            android:checked="true"
+            android:textColor="@android:color/black"
+            android:buttonTint= "@android:color/holo_orange_dark"
+            android:textStyle="bold"
+            android:text="@string/radioButtonVideo" />
+
+        <RadioButton
+            android:id="@+id/photoRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/black"
+            android:buttonTint= "@android:color/holo_orange_dark"
+            android:paddingRight="20dp"
+            android:layout_marginRight="10dp"
+            android:textStyle="bold"
+            android:text="@string/radioButtonPhoto" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/recognitionMethodTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textSize="28dp"
+        android:layout_marginTop="30dp"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@+id/videoOrPhotoRadioGroup"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/speed_font"
+        android:text="@string/processingMethod"/>
+
+
+
+</android.support.constraint.ConstraintLayout>

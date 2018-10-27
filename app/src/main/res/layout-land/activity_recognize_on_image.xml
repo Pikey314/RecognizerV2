@@ -17,7 +17,7 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="5dp"
         android:background="@android:color/black"
-        android:textColor="@android:color/holo_orange_light"
+        android:textColor="@android:color/holo_blue_bright"
         android:textSize="20dp"
         android:textStyle="bold"/>
 
@@ -26,7 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="483dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="38dp"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
@@ -119,7 +118,7 @@
         android:layout_marginBottom="5dp"
         android:layout_marginRight="5dp"
         android:text="@string/recognizeButton"
-        android:textColor="@android:color/holo_orange_light"
+        android:textColor="@android:color/holo_blue_light"
         android:textSize="20dp"
         android:textStyle="bold"
         android:visibility="invisible"/>
@@ -131,7 +130,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="5dp"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/share"/>
+        android:background="@drawable/share" />
 
 
 

@@ -5,7 +5,6 @@
     <string name="settings">Settings</string>
     <string name="overview">Overview</string>
     <string name="help">Help</string>
-    <string name="imageView02">ImageView2</string>
     <string name="recognitionMethodSpinnerPrompt">Choose a recognition method</string>
     <string name="radioButtonLive">LIVE</string>
     <string name="radioButtonGallery">GALLERY</string>
@@ -28,12 +27,17 @@
     <string name="setDistanceFromTheCar">set distance from the car</string>
     <string name="oldPates">old plates mode</string>
     <string name="amountOfPlates">number of plates for parallel recognition</string>
-    <string name="one">ONE</string>
-    <string name="two">TWO</string>
+    <string name="amountOfPlatesHorizontal">number of plates</string>
+    <string name="one">1</string>
+    <string name="two">UP TO 4</string>
     <string name="carDistanceIncreased">Distance from the car increased</string>
     <string name="carDistanceReduced">Distance from the car reduced</string>
     <string name="ocrOn">License plate characters recognition on</string>
     <string name="ocrOff">License plate characters recognition off</string>
-    <string name="oldPlatesModeOn">Old license plates recognition activated</string>
-    <string name="oldPlatesModeOff">Old license plates recognition disactivated</string>
+    <string name="oldPlatesModeOn">Old license plates recognition activated. Changing method to Morphological Transformations.</string>
+    <string name="oldPlatesModeOff">Old license plates recognition deactivated. Restoring </string>
+    <string name="startApp">press  here\nto  start</string>
+    <string name="startAppLand">press  here  to  start</string>
+    <string name="recognizeButton">Recognize!</string>
+
 </resources>

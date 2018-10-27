@@ -16,7 +16,7 @@ import org.opencv.core.Mat;
 
 public class CharacterRecognition {
 
-    public int getTextFromImage(Bitmap bitmap, Context context, TextView textView, TextView textView2, TextView textView3, TextView textView4){
+    public int getTextFromImage(Bitmap bitmap, Context context, TextView textView, TextView textView2, TextView textView3, TextView textView4, int numberOfPlates){
         int flag = 0;
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
 
@@ -24,30 +24,48 @@ public class CharacterRecognition {
         {
             Frame frame = new Frame.Builder().setBitmap(bitmap).build();
             SparseArray<TextBlock> items = textRecognizer.detect(frame);
-            String sb, s1="", s2="", s3="";
 
-            for (int i=0; i<items.size(); i++) {
-                TextBlock myItems = items.valueAt(i);
-                sb = myItems.getValue();
-                if (sb.length() >= 4 && sb.length() < 10 && !sb.matches(".*[a-z].*") && sb.matches(".*\\d+.*")) {
-                    if (flag == 0) {
-                        textView.setText(sb);
-                        s1 = sb;
-                        flag = 1;
-                    } else if (flag == 1 && !sb.equals(s1)) {
-                        textView2.setText(sb);
-                        s2 = sb;
-                        flag = 2;
-                    } else if (flag == 2 && !sb.equals(s1) && !sb.equals(s2)) {
-                        textView3.setText(sb);
-                        s3 = sb;
-                        flag = 3;
-                    } else if (flag == 3 && !sb.equals(s1) && !sb.equals(s2) && !sb.equals(s3)) {
-                        textView3.setText(sb);
-                        flag = 4;
-                        break;
+            if(numberOfPlates == 1){
+                if (items.size()!=0) {
+                     String sb0;
+                     for (int i = 0; i < items.size(); i++) {
+                         TextBlock myItems = items.valueAt(i);
+                         sb0 = myItems.getValue();
+                         if (sb0.length() >= 4 && sb0.length() < 10 && !sb0.matches(".*[a-z].*") && sb0.matches(".*\\d+.*")) {
+                             textView.setText(sb0);
+                             flag = 1;
+                             break;
+                         }
+
+                     }
+                }
+
+            } else {
+                String sb, s1 = "", s2 = "", s3 = "";
+
+                for (int i = 0; i < items.size(); i++) {
+                    TextBlock myItems = items.valueAt(i);
+                    sb = myItems.getValue();
+                    if (sb.length() >= 4 && sb.length() < 10 && !sb.matches(".*[a-z].*") && sb.matches(".*\\d+.*")) {
+                        if (flag == 0) {
+                            textView.setText(sb);
+                            s1 = sb;
+                            flag = 1;
+                        } else if (flag == 1 && !sb.equals(s1)) {
+                            textView2.setText(sb);
+                            s2 = sb;
+                            flag = 2;
+                        } else if (flag == 2 && !sb.equals(s1) && !sb.equals(s2)) {
+                            textView3.setText(sb);
+                            s3 = sb;
+                            flag = 3;
+                        } else if (flag == 3 && !sb.equals(s1) && !sb.equals(s2) && !sb.equals(s3)) {
+                            textView4.setText(sb);
+                            flag = 4;
+                            break;
+                        }
+
                     }
-
                 }
             }
 

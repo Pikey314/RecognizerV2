@@ -42,7 +42,7 @@
         android:textStyle="italic"
         android:layout_marginTop="3dp"
         android:layout_marginRight="15dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="OLD PLATES MODE"/>
 
     <TextView
@@ -55,7 +55,7 @@
         android:textStyle="italic"
         android:layout_marginTop="3dp"
         android:layout_marginLeft="25dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="OCR MODE"/>
 
     <TextView
@@ -68,7 +68,7 @@
         android:textStyle="italic"
         android:layout_marginTop="4dp"
         android:layout_marginLeft="20dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="OFF"/>
 
     <Switch
@@ -89,7 +89,7 @@
         android:textStyle="italic"
         android:layout_marginTop="4dp"
         android:layout_marginLeft="5dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="ON"/>
 
     <SeekBar
@@ -110,7 +110,7 @@
         android:textSize="15dp"
         android:textStyle="italic"
         android:layout_marginBottom="13dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="FAR"/>
 
     <TextView
@@ -121,7 +121,7 @@
         android:textSize="15dp"
         android:textStyle="italic"
         android:layout_marginBottom="13dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="CLOSE"/>
 
     <TextView
@@ -134,7 +134,7 @@
         android:textStyle="italic"
         android:layout_marginTop="4dp"
         android:layout_marginRight="20dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="ON"/>
 
     <Switch
@@ -147,6 +147,7 @@
         android:layout_toLeftOf="@+id/oldPlatesSwitchStartTextView"/>
 
     <TextView
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/oldPlatesModeTextView"
@@ -155,7 +156,7 @@
         android:textStyle="italic"
         android:layout_marginTop="4dp"
         android:layout_marginRight="5dp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@android:color/holo_blue_dark"
         android:text="OFF"/>
 
 

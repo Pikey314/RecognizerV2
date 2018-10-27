@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class SelectSourceForRecognitionActivity extends AppCompatActivity {
     private Spinner recognitionMethodSpinner;
@@ -59,14 +60,18 @@ public class SelectSourceForRecognitionActivity extends AppCompatActivity {
         if (liveOrGallerySelectionText.equals("LIVE") && videoOrPhotoSelectionText.equals("VIDEO")) {
             intent = new Intent(this, RecognizeOnLiveVideoActivity.class);
             intent.putExtra("spinnerValue", spinnerValueString);
+            startActivity(intent);
+        } else if (liveOrGallerySelectionText.equals("GALLERY") && videoOrPhotoSelectionText.equals("VIDEO")) {
+            Toast.makeText(this,"Gallery video recognition disabled in the current version of application",Toast.LENGTH_LONG).show();
         } else {
             intent = new Intent(this, ConfirmRecognitionSelectionActivity.class);
             intent.putExtra("spinnerValue", spinnerValueString);
             intent.putExtra("liveOrGallerySelectionText", liveOrGallerySelectionText);
             intent.putExtra("videoOrPhotoSelectionText", videoOrPhotoSelectionText);
+            startActivity(intent);
         }
 
-        startActivity(intent);
+
 
 
     }

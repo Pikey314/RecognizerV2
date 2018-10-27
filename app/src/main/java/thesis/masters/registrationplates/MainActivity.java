@@ -26,9 +26,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ImageView rimImageView1 = (ImageView) findViewById(R.id.rim1ImageView);
         ImageView rimImageView2 = (ImageView) findViewById(R.id.rim2ImageView);
+        ImageView rimImageView3 = (ImageView) findViewById(R.id.rim3ImageView);
+        ImageView rimImageView4 = (ImageView) findViewById(R.id.rim4ImageView);
         Animation rimAnimation =  AnimationUtils.loadAnimation(this, R.anim.spin);
         rimImageView1.startAnimation(rimAnimation);
         rimImageView2.startAnimation(rimAnimation);
+        rimImageView3.startAnimation(rimAnimation);
+        rimImageView4.startAnimation(rimAnimation);
         if(OpenCVLoader.initDebug())
         {
             Toast.makeText(getApplicationContext(),"OpenCV is here", Toast.LENGTH_SHORT).show();
