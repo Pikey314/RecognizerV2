@@ -108,7 +108,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"
         android:textSize="25dp"
-        android:textStyle="bold"
         android:textColor="@android:color/holo_orange_light"
         android:text="Change distance from a car"/>
 
@@ -132,7 +131,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginRight="5dp"
         android:textColor="@android:color/holo_orange_light"
-        android:text="OLD PLATES ON"/>
+        android:text="OLD PLATES OFF"/>
 
     <TextView
         android:id="@+id/oldPlatesOffTextView"
@@ -145,7 +144,15 @@
         android:layout_marginTop="12dp"
         android:layout_marginLeft="5dp"
         android:textColor="@android:color/holo_orange_light"
-        android:text="OLD PLATES OFF"/>
+        android:text="OLD PLATES ON"/>
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:background="@drawable/sharebutton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="shareRecognizedFrame"/>
 
 
 

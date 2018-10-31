@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -24,20 +25,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.RotatedRect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.ListIterator;
 
 public class RecognizeOnImageActivity extends AppCompatActivity {
     private static final int GALLERY_PICTURE = 101;
@@ -100,9 +92,9 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
         Button pickImageButton = findViewById(R.id.pickImageButton);
         if (this.liveGallerySelection.equals("LIVE"))
-            pickImageButton.setText(R.string.buttonTakeAPhoto);
+            pickImageButton.setBackgroundResource(R.drawable.takephotobutton);
         else
-            pickImageButton.setText(R.string.buttonPickImageFromGallery);
+            pickImageButton.setBackgroundResource(R.drawable.pickimagebutton);
 
     }
 
@@ -277,8 +269,45 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
             int recognizedPlates = this.characterRecognition.getTextFromImage(imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4,this.numberOfPlates);
             this.viewAdjuster.showPlateImageViewsAfterRecognition(recognizedPlates, this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);
             findViewById(R.id.recognizeImageButton).setVisibility(View.INVISIBLE);
+            findViewById(R.id.shareImageView).setVisibility(View.VISIBLE);
 
         }
+
+    }
+
+    public void shareRecognizedImage(View v){
+        if (this.recognizedBitmap != null) {
+            if ((this.textViewRecognitionOutput.getText().toString()).equals(""))
+                prepareFileToShare(this.recognizedBitmap, "Recognizer_license_plate");
+            else
+                prepareFileToShare(this.recognizedBitmap, "Plate nr: " + (this.textViewRecognitionOutput.getText().toString()));
+        }
+
+
+    }
+
+
+    private void prepareFileToShare (Bitmap bitmap,String filename) {
+
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("image/png");
+        ByteArrayOutputStream bytaArray = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytaArray);
+        File imageFile = new File(Environment.getExternalStorageDirectory() + File.separator + filename + ".png");
+        try {
+            imageFile.createNewFile();
+            FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
+            fileOutputStream.write(bytaArray.toByteArray());
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
+        startActivity(Intent.createChooser(share, "Recognizer share license plate"));
+        //SPRAWDZIC TO
+        imageFile.deleteOnExit();
+
+
 
     }
 }

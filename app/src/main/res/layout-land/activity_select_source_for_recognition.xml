@@ -46,7 +46,7 @@
         android:textSize="28dp"
         android:textAlignment="center"
         android:fontFamily="@font/speed_font"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:text="@string/recognitionMode"/>
 
     <RadioGroup
@@ -68,7 +68,7 @@
             android:paddingRight="100dp"
             android:checked="true"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:buttonTint= "@android:color/holo_red_dark"
             android:text="@string/radioButtonLive" />
 
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingRight="10dp"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:buttonTint= "@android:color/holo_red_dark"
             android:textStyle="bold"
             android:text="@string/radioButtonGallery" />
@@ -95,7 +95,7 @@
         android:paddingRight="10dp"
         android:textSize="28dp"
         android:textAlignment="center"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:fontFamily="@font/speed_font"
         app:layout_constraintTop_toBottomOf="@+id/liveOrPrerecordedRadioGroup"
         android:text="@string/resourceType"/>
@@ -118,7 +118,7 @@
             android:layout_weight="1"
             android:paddingRight="100dp"
             android:checked="true"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:buttonTint= "@android:color/holo_orange_dark"
             android:textStyle="bold"
             android:text="@string/radioButtonVideo" />
@@ -128,7 +128,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:buttonTint= "@android:color/holo_orange_dark"
             android:paddingRight="20dp"
             android:layout_marginRight="10dp"
@@ -147,7 +147,7 @@
         android:layout_marginTop="30dp"
         android:textAlignment="center"
         app:layout_constraintTop_toBottomOf="@+id/videoOrPhotoRadioGroup"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:fontFamily="@font/speed_font"
         android:text="@string/processingMethod"/>
 

@@ -9,17 +9,13 @@
 
     <Button
         android:id="@+id/pickImageButton"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_width="175dp"
+        android:layout_height="70dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:onClick="pickImageFromGallery"
         android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:background="@android:color/black"
-        android:textColor="@android:color/holo_orange_light"
-        android:textSize="20dp"
-        android:textStyle="bold"/>
+        android:layout_marginLeft="5dp"/>
 
     <ImageView
         android:id="@+id/imageToBeRecognizedImageView"
@@ -110,28 +106,27 @@
 
     <Button
         android:id="@+id/recognizeImageButton"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_width="175dp"
+        android:layout_height="70dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/black"
+        android:background="@drawable/recognizebutton"
         android:onClick="recognizeTestMethod1"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="5dp"
-        android:text="@string/recognizeButton"
-        android:textColor="@android:color/holo_orange_light"
-        android:textSize="20dp"
-        android:textStyle="bold"
         android:visibility="invisible"/>
 
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:id="@+id/shareImageView"
+        android:layout_width="175dp"
+        android:layout_height="70dp"
         android:layout_above="@+id/pickImageButton"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="5dp"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/share"/>
+        android:background="@drawable/sharebutton"
+        android:onClick="shareRecognizedImage"
+        android:visibility="invisible"/>
 
 
 

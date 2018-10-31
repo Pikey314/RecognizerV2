@@ -10,53 +10,49 @@
 
     <ImageView
         android:id="@+id/rim1ImageView"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:srcCompat="@drawable/rim1" />
 
     <ImageView
         android:id="@+id/rim2ImageView"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/rim1" />
 
     <ImageView
         android:id="@+id/rim3ImageView"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/rim1" />
 
     <ImageView
         android:id="@+id/rim4ImageView"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:srcCompat="@drawable/rim1" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/startApp"
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="75dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:fontFamily="@font/speed_font"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
-        android:textSize="30dp"
         android:layout_marginBottom="70dp"
-        android:textAlignment="center"
         android:onClick="goToSelectRecognitionMethodActivity"
-        android:textColor="@android:color/black"
+        android:background="@drawable/startbutton"
         />
 
 

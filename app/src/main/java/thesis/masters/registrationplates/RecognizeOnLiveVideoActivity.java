@@ -2,11 +2,14 @@ package thesis.masters.registrationplates;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,17 +28,23 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
     CameraBridgeViewBase cameraBridgeViewBase;
     Mat originalImageMat, processingMat1, processingMat2, processingMat3, transposeMat, flipMat, ocrMat, processingMat4;
-    Bitmap recognitionBitmap, recognitionBitmapPortrait, recognitionBitmapLandscape;
+    Bitmap recognitionBitmap, recognitionBitmapPortrait, recognitionBitmapLandscape, shareBitmapPortrait, shareBitmapLandscape;
     BaseLoaderCallback baseLoaderCallback;
     TextView textViewVideoRecognitionOutput;
     ImageView plateImageView;
@@ -190,7 +199,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         ocrMat = originalImageMat;
 
         this.orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (this.orientation == Configuration.ORIENTATION_PORTRAIT) {
             Core.transpose(originalImageMat, transposeMat);
             Imgproc.resize(transposeMat, flipMat, flipMat.size(), 0, 0, 0);
             Core.flip(flipMat, originalImageMat, 1);
@@ -251,6 +260,8 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         ocrMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
         recognitionBitmapPortrait = Bitmap.createBitmap(originalImageMat.cols(), originalImageMat.rows(), Bitmap.Config.ARGB_8888);
         recognitionBitmapLandscape = Bitmap.createBitmap(originalImageMat.rows(), originalImageMat.cols(), Bitmap.Config.ARGB_8888);
+        shareBitmapPortrait = Bitmap.createBitmap(originalImageMat.cols(), originalImageMat.rows(), Bitmap.Config.ARGB_8888);
+        shareBitmapLandscape = Bitmap.createBitmap(originalImageMat.rows(), originalImageMat.cols(), Bitmap.Config.ARGB_8888);
 
 
     }
@@ -278,5 +289,53 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         if (cameraBridgeViewBase != null) {
             cameraBridgeViewBase.disableView();
         }
+    }
+
+    public void shareRecognizedFrame(View v){
+        if (this.originalImageMat != null) {
+            if (this.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Utils.matToBitmap(originalImageMat, shareBitmapPortrait);
+                if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
+                    prepareFileToShareVideo(this.shareBitmapPortrait, "Recognizer_license_plate");
+                else
+                    prepareFileToShareVideo(this.shareBitmapPortrait, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
+
+            }
+            else {
+                Utils.matToBitmap(originalImageMat, shareBitmapLandscape);
+                if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
+                    prepareFileToShareVideo(this.shareBitmapLandscape, "Recognizer_license_plate");
+                else
+                    prepareFileToShareVideo(this.shareBitmapLandscape, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
+
+            }
+        }
+
+
+    }
+
+
+    private void prepareFileToShareVideo (Bitmap bitmap,String filename) {
+
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("image/png");
+        ByteArrayOutputStream bytaArray = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytaArray);
+        File imageFile = new File(Environment.getExternalStorageDirectory() + File.separator + filename + ".png");
+        try {
+            imageFile.createNewFile();
+            FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
+            fileOutputStream.write(bytaArray.toByteArray());
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
+        startActivity(Intent.createChooser(share, "Recognizer share license plate"));
+        //SPRAWDZIC TO
+        imageFile.deleteOnExit();
+
+
+
     }
 }

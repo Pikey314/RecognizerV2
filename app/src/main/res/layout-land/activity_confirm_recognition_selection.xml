@@ -18,7 +18,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:textAlignment="center"
         android:layout_marginTop="5dp"
-        android:textColor="@android:color/black"/>
+        android:textColor="@android:color/white"/>
 
     <Button
         android:id="@+id/selectResourceButton"
@@ -52,7 +52,7 @@
         android:textSize="20dp"
         android:textAlignment="center"
         android:fontFamily="@font/speed_font"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:text="@string/setDistanceFromTheCar"/>
 
     <TextView
@@ -65,7 +65,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginRight="50dp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:text="FAR"/>
 
     <SeekBar
@@ -88,7 +88,7 @@
         android:layout_marginTop="5dp"
         android:textSize="15dp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:text="CLOSE"/>
 
     <TextView
@@ -104,7 +104,7 @@
         android:textSize="20dp"
         android:textAlignment="center"
         android:fontFamily="@font/speed_font"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:text="@string/oldPates"/>
 
     <Switch
@@ -125,7 +125,7 @@
         android:layout_marginTop="5dp"
         android:textSize="15dp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:text="ON"/>
 
     <TextView
@@ -136,7 +136,7 @@
         android:layout_marginTop="5dp"
         android:textSize="15dp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:text="OFF"/>
 
     <TextView
@@ -150,7 +150,7 @@
         android:textSize="20dp"
         android:textAlignment="center"
         android:fontFamily="@font/speed_font"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:text="@string/amountOfPlatesHorizontal"/>
 
     <RadioGroup
@@ -172,7 +172,7 @@
             android:paddingRight="100dp"
             android:checked="true"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:buttonTint= "@android:color/holo_blue_dark"
             android:text="@string/one" />
 
@@ -182,7 +182,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingRight="10dp"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:buttonTint= "@android:color/holo_red_light"
             android:textStyle="bold"
             android:text="@string/two" />
