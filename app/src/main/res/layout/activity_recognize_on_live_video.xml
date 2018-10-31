@@ -154,6 +154,16 @@
         android:layout_alignParentTop="true"
         android:onClick="shareRecognizedFrame"/>
 
+    <ImageView
+        android:id="@+id/plateInfoVideoImageView"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:background="@drawable/polishplateinfo"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:onClick="showPolishPlateDetailedInfoVideo"
+        android:visibility="invisible"/>
+
 
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package thesis.masters.registrationplates;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -54,12 +56,18 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
     CharacterRecognition characterRecognition;
     private int orientation;
     PlateDetector plateDetector;
+    PlateDetailsInformator plateDetailsInformator;
     SeekBar seekBarDistanceFromPlate;
     private boolean oldPlatesMode;
     private boolean ocrActive;
     private int distanceFromPlate;
     private String recognitionMethod;
     private final int CAMERA_PERMISSION_CODE = 333;
+    private final int SHARING_PERMISSIONS_CODE = 432;
+    private String[] SHARING_PERMISSIONS = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
     private int ocrDelay;
 
     @Override
@@ -79,11 +87,13 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
                     ocrActive = true;
                     plateImageView.setVisibility(View.VISIBLE);
                     ocrDelay = 0;
+                    findViewById(R.id.plateInfoVideoImageView).setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(getApplicationContext(), getString(R.string.ocrOff),Toast.LENGTH_SHORT).show();
                     ocrActive = false;
                     plateImageView.setVisibility(View.INVISIBLE);
                     textViewVideoRecognitionOutput.setText("");
+                    findViewById(R.id.plateInfoVideoImageView).setVisibility(View.INVISIBLE);
                 }
 
             }
@@ -120,6 +130,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         characterRecognition = new CharacterRecognition();
         textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
         plateDetector = new PlateDetector();
+        plateDetailsInformator = new PlateDetailsInformator(this);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             this.recognitionMethod = extras.getString("spinnerValue");
@@ -180,6 +191,30 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         }
     }
 
+    private void requestSharingPermissions(){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                || ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.READ_EXTERNAL_STORAGE))   {
+            new AlertDialog.Builder(this)
+                    .setTitle("Storage Access permission needed")
+                    .setMessage("Do You allow Recognizer application to use the external storage? This permission is necessary for sharing.")
+                    .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(RecognizeOnLiveVideoActivity.this, SHARING_PERMISSIONS,SHARING_PERMISSIONS_CODE);
+                        }
+                    })
+                    .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create().show();
+        } else {
+            ActivityCompat.requestPermissions(this, SHARING_PERMISSIONS,SHARING_PERMISSIONS_CODE);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == CAMERA_PERMISSION_CODE) {
@@ -188,6 +223,39 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
                 Toast.makeText(this, "Camera Permission granted", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Camera Permission not granted", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == SHARING_PERMISSIONS_CODE) {
+            if (grantResults.length > 0) {
+                boolean permissions_flag = true;
+                for (int i = 0; i <  grantResults.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED)
+                        permissions_flag = false;
+                }
+                if (permissions_flag) {
+                    if (this.originalImageMat != null) {
+                        if (this.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                            Utils.matToBitmap(originalImageMat, shareBitmapPortrait);
+                            if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
+                                prepareFileToShareVideo(this.shareBitmapPortrait, "Recognizer_license_plate");
+                            else
+                                prepareFileToShareVideo(this.shareBitmapPortrait, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
+
+                        } else {
+                            Utils.matToBitmap(originalImageMat, shareBitmapLandscape);
+                            if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
+                                prepareFileToShareVideo(this.shareBitmapLandscape, "Recognizer_license_plate");
+                            else
+                                prepareFileToShareVideo(this.shareBitmapLandscape, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
+
+                        }
+                    }
+                    Toast.makeText(this,"Sharing permission granted",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this,"Permission not granted",Toast.LENGTH_SHORT).show();
+                }
+            }
+            else {
+                Toast.makeText(this,"Permission not granted",Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -292,22 +360,26 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
     }
 
     public void shareRecognizedFrame(View v){
-        if (this.originalImageMat != null) {
-            if (this.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                Utils.matToBitmap(originalImageMat, shareBitmapPortrait);
-                if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
-                    prepareFileToShareVideo(this.shareBitmapPortrait, "Recognizer_license_plate");
-                else
-                    prepareFileToShareVideo(this.shareBitmapPortrait, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
+        if (ContextCompat.checkSelfPermission(RecognizeOnLiveVideoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(RecognizeOnLiveVideoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            requestSharingPermissions();
+        } else {
+            if (this.originalImageMat != null) {
+                if (this.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    Utils.matToBitmap(originalImageMat, shareBitmapPortrait);
+                    if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
+                        prepareFileToShareVideo(this.shareBitmapPortrait, "Recognizer_license_plate");
+                    else
+                        prepareFileToShareVideo(this.shareBitmapPortrait, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
 
-            }
-            else {
-                Utils.matToBitmap(originalImageMat, shareBitmapLandscape);
-                if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
-                    prepareFileToShareVideo(this.shareBitmapLandscape, "Recognizer_license_plate");
-                else
-                    prepareFileToShareVideo(this.shareBitmapLandscape, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
+                } else {
+                    Utils.matToBitmap(originalImageMat, shareBitmapLandscape);
+                    if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
+                        prepareFileToShareVideo(this.shareBitmapLandscape, "Recognizer_license_plate");
+                    else
+                        prepareFileToShareVideo(this.shareBitmapLandscape, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
 
+                }
             }
         }
 
@@ -337,5 +409,13 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
 
 
 
+    }
+
+    public void showPolishPlateDetailedInfoVideo(View v){
+        if(this.textViewVideoRecognitionOutput.getText().toString()!=null && !this.textViewVideoRecognitionOutput.getText().toString().equals("")){
+            String polishPlateDetails = plateDetailsInformator.getPolishPlateDetailedInfo(this.textViewVideoRecognitionOutput.getText().toString());
+            if (!polishPlateDetails.equals(""))
+                Toast.makeText(this,polishPlateDetails,Toast.LENGTH_LONG).show();
+        }
     }
 }

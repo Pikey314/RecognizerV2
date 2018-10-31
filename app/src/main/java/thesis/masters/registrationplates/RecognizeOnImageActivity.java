@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -48,6 +50,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     ImageView plateImageView,plateImageView2,plateImageView3,plateImageView4;
     CharacterRecognition characterRecognition;
     ViewAdjuster viewAdjuster;
+    PlateDetailsInformator plateDetailsInformator;
     PlateDetector plateDetector;
     private String recognitionMethod;
     private final int ALL_PERMISSIONS_CODE = 444;
@@ -55,6 +58,11 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA
+    };
+    private final int SHARING_PERMISSIONS_CODE = 543;
+    private String[] SHARING_PERMISSIONS = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
     };
 
 
@@ -70,6 +78,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         this.textViewRecognitionOutput2 = findViewById(R.id.recognitionImageOutputTextView2);
         this.textViewRecognitionOutput3 = findViewById(R.id.recognitionImageOutputTextView3);
         this.textViewRecognitionOutput4 = findViewById(R.id.recognitionImageOutputTextView4);
+        this.plateDetailsInformator = new PlateDetailsInformator(this);
         this.plateImageView = findViewById(R.id.plateStaticImageView);
         this.plateImageView2 = findViewById(R.id.plateStaticImageView2);
         this.plateImageView3 = findViewById(R.id.plateStaticImageView3);
@@ -125,6 +134,30 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         }
     }
 
+    private void requestSharingPermissionsImage(){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                || ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.READ_EXTERNAL_STORAGE))   {
+            new AlertDialog.Builder(this)
+                    .setTitle("Storage Access permission needed")
+                    .setMessage("Do You allow Recognizer application to use the external storage? This permission is necessary for sharing.")
+                    .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(RecognizeOnImageActivity.this, SHARING_PERMISSIONS,SHARING_PERMISSIONS_CODE);
+                        }
+                    })
+                    .setNegativeButton("Disagree", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create().show();
+        } else {
+            ActivityCompat.requestPermissions(this, SHARING_PERMISSIONS,SHARING_PERMISSIONS_CODE);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == ALL_PERMISSIONS_CODE) {
@@ -150,6 +183,29 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
             }
             else {
                 Toast.makeText(this,"Not all permissions granted",Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (requestCode == SHARING_PERMISSIONS_CODE) {
+            if (grantResults.length > 0) {
+                boolean permissions_flag = true;
+                for (int i = 0; i <  grantResults.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED)
+                        permissions_flag = false;
+                }
+                if (permissions_flag) {
+                    if (this.recognizedBitmap != null) {
+                        if ((this.textViewRecognitionOutput.getText().toString()).equals(""))
+                            prepareFileToShare(this.recognizedBitmap, "Recognizer_license_plate");
+                        else
+                            prepareFileToShare(this.recognizedBitmap, "Plate nr: " + (this.textViewRecognitionOutput.getText().toString()));
+                    }
+                    Toast.makeText(this,"Sharing permission granted",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this,"Permission not granted",Toast.LENGTH_SHORT).show();
+                }
+            }
+            else {
+                Toast.makeText(this,"Permission not granted",Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -190,7 +246,8 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         this.viewAdjuster.hideAllPlateImageViews(this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);
         this.viewAdjuster.hideAllPlateOutputTextViews(this.textViewRecognitionOutput,this.textViewRecognitionOutput2 ,this.textViewRecognitionOutput3 ,this.textViewRecognitionOutput4);
-
+        findViewById(R.id.plateInfoImageView).setVisibility(View.INVISIBLE);
+        findViewById(R.id.shareImageView).setVisibility(View.INVISIBLE);
         findViewById(R.id.recognizeImageButton).setVisibility(View.VISIBLE);
 
         if (data != null && resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
@@ -270,17 +327,24 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
             this.viewAdjuster.showPlateImageViewsAfterRecognition(recognizedPlates, this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);
             findViewById(R.id.recognizeImageButton).setVisibility(View.INVISIBLE);
             findViewById(R.id.shareImageView).setVisibility(View.VISIBLE);
+            if (this.numberOfPlates == 1 && this.textViewRecognitionOutput.getText().toString()!=null && !this.textViewRecognitionOutput.getText().toString().equals(""))
+                findViewById(R.id.plateInfoImageView).setVisibility(View.VISIBLE);
 
         }
 
     }
 
     public void shareRecognizedImage(View v){
-        if (this.recognizedBitmap != null) {
-            if ((this.textViewRecognitionOutput.getText().toString()).equals(""))
-                prepareFileToShare(this.recognizedBitmap, "Recognizer_license_plate");
-            else
-                prepareFileToShare(this.recognizedBitmap, "Plate nr: " + (this.textViewRecognitionOutput.getText().toString()));
+        if (ContextCompat.checkSelfPermission(RecognizeOnImageActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(RecognizeOnImageActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            requestSharingPermissionsImage();
+        } else {
+            if (this.recognizedBitmap != null) {
+                if ((this.textViewRecognitionOutput.getText().toString()).equals(""))
+                    prepareFileToShare(this.recognizedBitmap, "Recognizer_license_plate");
+                else
+                    prepareFileToShare(this.recognizedBitmap, "Plate nr: " + (this.textViewRecognitionOutput.getText().toString()));
+            }
         }
 
 
@@ -309,6 +373,14 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public void showPolishPlateDetailedInfo(View v){
+        if(this.textViewRecognitionOutput.getText().toString()!=null && !this.textViewRecognitionOutput.getText().toString().equals("")){
+            String polishPlateDetails = plateDetailsInformator.getPolishPlateDetailedInfo(this.textViewRecognitionOutput.getText().toString());
+            if (!polishPlateDetails.equals(""))
+                Toast.makeText(this,polishPlateDetails,Toast.LENGTH_LONG).show();
+        }
     }
 }
 
