@@ -14,6 +14,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -135,7 +136,14 @@ public class PlateDetector {
                     }
                 }
             }
-            Imgproc.drawContours(initialImageMat, contours, biggestContourIndex, new Scalar(255, 0, 0), contourThickness);
+            //Imgproc.drawContours(initialImageMat, contours, biggestContourIndex, new Scalar(255, 0, 0), contourThickness);
+            //TEST RECT START
+            Rect rect = Imgproc.boundingRect(contours.get(biggestContourIndex));
+            Point tl = rect.tl();
+            Point br = rect.br();
+            Imgproc.rectangle(initialImageMat,tl,br,new Scalar(255, 0, 0), contourThickness);
+            //TEST RECT END
+
         }
 
         Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
@@ -349,13 +357,22 @@ public class PlateDetector {
         if (numberOfPoints != 0) {
             centerX = centerX / numberOfPoints;
             centerY = centerY / numberOfPoints;
-            Imgproc.circle(matToReturn, new Point(centerX, centerY), 7, new Scalar(255, 0, 0), -1);
+            //Imgproc.circle(matToReturn, new Point(centerX, centerY), 7, new Scalar(255, 0, 0), -1);
             for (int i = 0; i < contours2.size(); i++) {
                 double test = Imgproc.pointPolygonTest(new MatOfPoint2f(contours2.get(i).toArray()), new Point(centerX, centerY), false);
-                if (test > -1)
-                    Imgproc.drawContours(matToReturn, contours2, i, new Scalar(0, 255, 0), contourThickness);
+                if (test > -1) {
+                    //TEST RECT START
+                    //Imgproc.drawContours(matToReturn, contours2, i, new Scalar(0, 255, 0), contourThickness);
+                    Rect rect = Imgproc.boundingRect(contours2.get(i));
+                    Point tl = rect.tl();
+                    Point br = rect.br();
+                    Imgproc.rectangle(matToReturn,tl,br,new Scalar(0, 255, 0), contourThickness);
+                    //TEST RECT END
+
+
+                }
             }
-            Imgproc.rectangle(matToReturn, new Point(centerX - smallPlateRectangleWidth, centerY - smallPlateRectangleHeight), new Point(centerX + smallPlateRectangleWidth, centerY + smallPlateRectangleHeight), new Scalar(0, 255, 0));
+            //Imgproc.rectangle(matToReturn, new Point(centerX - smallPlateRectangleWidth, centerY - smallPlateRectangleHeight), new Point(centerX + smallPlateRectangleWidth, centerY + smallPlateRectangleHeight), new Scalar(0, 255, 0));
         }
         Bitmap bitmapToReturn = Bitmap.createBitmap(initialImageBitmapWidth, initialImageBitmapHeight, Bitmap.Config.RGB_565);
         Utils.matToBitmap(matToReturn, bitmapToReturn);
@@ -470,10 +487,17 @@ public class PlateDetector {
             Imgproc.circle(originalImageMat, new Point(centerX, centerY), 7, new Scalar(255, 0, 0), -1);
             for (int i = 0; i < contours2.size(); i++) {
                 double test = Imgproc.pointPolygonTest(new MatOfPoint2f(contours2.get(i).toArray()), new Point(centerX, centerY), false);
-                if (test > -1)
-                    Imgproc.drawContours(originalImageMat, contours2, i, new Scalar(0, 255, 0), contourThickness);
+                if (test > -1) {
+                    //RECT TEST START
+                    // Imgproc.drawContours(originalImageMat, contours2, i, new Scalar(0, 255, 0), contourThickness);
+                    Rect rect = Imgproc.boundingRect(contours2.get(i));
+                    Point tl = rect.tl();
+                    Point br = rect.br();
+                    Imgproc.rectangle(originalImageMat, tl, br, new Scalar(0, 255, 0), contourThickness);
+                    //TEST RECT END
+                }
             }
-            Imgproc.rectangle(originalImageMat, new Point(centerX - smallPlateRectangleWidth, centerY - smallPlateRectangleHeight), new Point(centerX + smallPlateRectangleWidth, centerY + smallPlateRectangleHeight), new Scalar(0, 255, 0));
+            //Imgproc.rectangle(originalImageMat, new Point(centerX - smallPlateRectangleWidth, centerY - smallPlateRectangleHeight), new Point(centerX + smallPlateRectangleWidth, centerY + smallPlateRectangleHeight), new Scalar(0, 255, 0));
         }
 
         return originalImageMat;
@@ -655,7 +679,13 @@ public class PlateDetector {
                     }
                 }
             }
-            Imgproc.drawContours(originalImageMat, contours, biggestContourIndex, new Scalar(255, 0, 0), contourThickness);
+            //TEST RECT START
+            //Imgproc.drawContours(originalImageMat, contours, biggestContourIndex, new Scalar(255, 0, 0), contourThickness);
+            Rect rect = Imgproc.boundingRect(contours.get(biggestContourIndex));
+            Point tl = rect.tl();
+            Point br = rect.br();
+            Imgproc.rectangle(originalImageMat,tl,br,new Scalar(255, 0, 0), contourThickness);
+            //TEST RECT END
         }
         return originalImageMat;
     }
