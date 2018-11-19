@@ -1,12 +1,6 @@
 package thesis.masters.registrationplates;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.widget.Toast;
-
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -15,15 +9,12 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
-import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 public class PlateDetector {
 

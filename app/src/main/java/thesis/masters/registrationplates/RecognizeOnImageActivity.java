@@ -8,11 +8,9 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -26,32 +24,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class RecognizeOnImageActivity extends AppCompatActivity {
     private static final int GALLERY_PICTURE = 101;
     private static final int CAMERA_PHOTO = 202;
 
-    ImageView imageView;
-    Uri imageURI;
-    Uri photoURI;
-    Bitmap imageBitmap ,recognizedBitmap;
-    String liveGallerySelection;
+    private ImageView imageView;
+    private Uri imageURI;
+    private Uri photoURI;
+    private Bitmap imageBitmap ,recognizedBitmap;
+    private String liveGallerySelection;
     private boolean oldPlatesMode;
     private int numberOfPlates;
     private int distanceFromPlate;
-    //String mCurrentPhotoPath;
-    TextView textViewRecognitionOutput, textViewRecognitionOutput2, textViewRecognitionOutput3, textViewRecognitionOutput4;
-    ImageView plateImageView,plateImageView2,plateImageView3,plateImageView4;
-    CharacterRecognition characterRecognition;
-    ViewAdjuster viewAdjuster;
-    PlateDetailsInformator plateDetailsInformator;
-    PlateDetector plateDetector;
+    private TextView textViewRecognitionOutput, textViewRecognitionOutput2, textViewRecognitionOutput3, textViewRecognitionOutput4;
+    private ImageView plateImageView,plateImageView2,plateImageView3,plateImageView4;
+    private CharacterRecognition characterRecognition;
+    private ViewAdjuster viewAdjuster;
+    private PlateDetailsInformator plateDetailsInformator;
+    private ShareExecuter shareExecuter;
+    private PlateDetector plateDetector;
     private String recognitionMethod;
     private final int ALL_PERMISSIONS_CODE = 444;
     private String[] ALL_PERMISSIONS = {
@@ -72,6 +66,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recognize_on_image);
         this.characterRecognition = new CharacterRecognition();
         this.plateDetector = new PlateDetector();
+        this.shareExecuter = new ShareExecuter();
         this.viewAdjuster = new ViewAdjuster();
         this.imageView = findViewById(R.id.imageToBeRecognizedImageView);
         this.textViewRecognitionOutput = findViewById(R.id.recognitionImageOutputTextView);
@@ -85,7 +80,6 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         this.plateImageView4 = findViewById(R.id.plateStaticImageView4);
         this.viewAdjuster.hideAllPlateImageViews(this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);
         this.viewAdjuster.hideAllPlateOutputTextViews(this.textViewRecognitionOutput,this.textViewRecognitionOutput2 ,this.textViewRecognitionOutput3 ,this.textViewRecognitionOutput4);
-
         OpenCVLoader.initDebug();
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -98,7 +92,6 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         else {
             throw new RuntimeException("Problem with settings");
         }
-
         Button pickImageButton = findViewById(R.id.pickImageButton);
         if (this.liveGallerySelection.equals("LIVE"))
             pickImageButton.setBackgroundResource(R.drawable.takephotobutton);
@@ -172,9 +165,9 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.Images.Media.TITLE, "Recognizer App Photo");
                     values.put(MediaStore.Images.Media.DESCRIPTION, "Live image recognition resource photo");
-                    photoURI = getContentResolver().insert(
+                    this.photoURI = getContentResolver().insert(
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, this.photoURI);
                     startActivityForResult(cameraIntent, CAMERA_PHOTO);
                     Toast.makeText(this,"All permissions granted",Toast.LENGTH_SHORT).show();
                 } else {
@@ -195,9 +188,9 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                 if (permissions_flag) {
                     if (this.recognizedBitmap != null) {
                         if ((this.textViewRecognitionOutput.getText().toString()).equals(""))
-                            prepareFileToShare(this.recognizedBitmap, "Recognizer_license_plate");
+                            prepareFileToShareImageActivity(this.recognizedBitmap, "Recognizer_license_plate");
                         else
-                            prepareFileToShare(this.recognizedBitmap, "Plate nr: " + (this.textViewRecognitionOutput.getText().toString()));
+                            prepareFileToShareImageActivity(this.recognizedBitmap, "Plate nr: " + (this.textViewRecognitionOutput.getText().toString()));
                     }
                     Toast.makeText(this,"Sharing permission granted",Toast.LENGTH_SHORT).show();
                 } else {
@@ -211,10 +204,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
     }
 
 
-
-
     public void pickImageFromGallery(View view) {
-
         switch (this.liveGallerySelection) {
             case "GALLERY":
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -230,12 +220,10 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                     ContentValues values = new ContentValues();
                     values.put(MediaStore.Images.Media.TITLE, "Recognizer App Photo");
                     values.put(MediaStore.Images.Media.DESCRIPTION, "Live image recognition resource photo");
-                    photoURI = getContentResolver().insert(
+                    this.photoURI = getContentResolver().insert(
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, this.photoURI);
                     startActivityForResult(cameraIntent, CAMERA_PHOTO);
-
-
                     break;
                 }
         }
@@ -249,30 +237,26 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         findViewById(R.id.plateInfoImageView).setVisibility(View.INVISIBLE);
         findViewById(R.id.shareImageView).setVisibility(View.INVISIBLE);
         findViewById(R.id.recognizeImageButton).setVisibility(View.VISIBLE);
-
         if (data != null && resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
             this.imageURI = data.getData();
-
             try {
-                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageURI);
-                if (imageBitmap.getHeight()>ViewAdjuster.MAX_ALLOWED_BITMAP_HEIGHT || imageBitmap.getWidth()>ViewAdjuster.MAX_ALLOWED_BITMAP_WIDTH)
-                    imageBitmap = viewAdjuster.adjustBitmap(imageBitmap);
-                if (imageBitmap.getByteCount() > viewAdjuster.MAX_ALLOWED_BYTE_SIZE)
-                    this.imageBitmap = viewAdjuster.scaleBitmap(this.imageBitmap);
+                this.imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), this.imageURI);
+                if (this.imageBitmap.getHeight()>ViewAdjuster.MAX_ALLOWED_BITMAP_HEIGHT || this.imageBitmap.getWidth()>ViewAdjuster.MAX_ALLOWED_BITMAP_WIDTH)
+                    this.imageBitmap = this.viewAdjuster.adjustBitmap(this.imageBitmap);
+                if (this.imageBitmap.getByteCount() > this.viewAdjuster.MAX_ALLOWED_BYTE_SIZE)
+                    this.imageBitmap = this.viewAdjuster.scaleBitmap(this.imageBitmap);
 
-                this.imageView.setImageBitmap(imageBitmap);
+                this.imageView.setImageBitmap(this.imageBitmap);
                 Toast.makeText(getApplicationContext(),Integer.toString(this.imageBitmap.getByteCount()), Toast.LENGTH_LONG).show();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         } else if (resultCode == RESULT_OK && requestCode == CAMERA_PHOTO) {
             try {
-                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                if (imageBitmap.getHeight()>ViewAdjuster.MAX_ALLOWED_BITMAP_HEIGHT || imageBitmap.getWidth()>ViewAdjuster.MAX_ALLOWED_BITMAP_WIDTH)
-                    imageBitmap = viewAdjuster.adjustBitmap(imageBitmap);
-                if (imageBitmap.getByteCount() > viewAdjuster.MAX_ALLOWED_BYTE_SIZE)
+                this.imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), this.photoURI);
+                if (this.imageBitmap.getHeight()>ViewAdjuster.MAX_ALLOWED_BITMAP_HEIGHT || this.imageBitmap.getWidth()>ViewAdjuster.MAX_ALLOWED_BITMAP_WIDTH)
+                    this.imageBitmap = viewAdjuster.adjustBitmap(imageBitmap);
+                if (this.imageBitmap.getByteCount() > viewAdjuster.MAX_ALLOWED_BYTE_SIZE)
                     this.imageBitmap = viewAdjuster.scaleBitmap(this.imageBitmap);
 
                 this.imageView.setImageBitmap(imageBitmap);
@@ -283,28 +267,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-/*    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  *//* prefix *//*
-                ".jpg",         *//* suffix *//*
-                storageDir      *//* directory *//*
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }*/
-
-
     public void recognizeTestMethod1(View view) {
-
         if (this.imageBitmap != null)
         {
             if (this.oldPlatesMode || this.numberOfPlates > 1)
@@ -322,16 +285,14 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                         break;
                 }
             }
-            imageView.setImageBitmap(this.recognizedBitmap);
-            int recognizedPlates = this.characterRecognition.getTextFromImage(imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4,this.numberOfPlates);
+            this.imageView.setImageBitmap(this.recognizedBitmap);
+            int recognizedPlates = this.characterRecognition.getTextFromImage(this.imageBitmap, getApplicationContext(), this.textViewRecognitionOutput, this.textViewRecognitionOutput2, this.textViewRecognitionOutput3, this.textViewRecognitionOutput4,this.numberOfPlates);
             this.viewAdjuster.showPlateImageViewsAfterRecognition(recognizedPlates, this.plateImageView, this.plateImageView2, this.plateImageView3, this.plateImageView4);
             findViewById(R.id.recognizeImageButton).setVisibility(View.INVISIBLE);
             findViewById(R.id.shareImageView).setVisibility(View.VISIBLE);
             if (this.numberOfPlates == 1 && this.textViewRecognitionOutput.getText().toString()!=null && !this.textViewRecognitionOutput.getText().toString().equals(""))
                 findViewById(R.id.plateInfoImageView).setVisibility(View.VISIBLE);
-
         }
-
     }
 
     public void shareRecognizedImage(View v){
@@ -341,38 +302,17 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         } else {
             if (this.recognizedBitmap != null) {
                 if ((this.textViewRecognitionOutput.getText().toString()).equals(""))
-                    prepareFileToShare(this.recognizedBitmap, "Recognizer_license_plate");
+                    prepareFileToShareImageActivity(this.recognizedBitmap, "Recognizer_license_plate");
                 else
-                    prepareFileToShare(this.recognizedBitmap, "Plate nr: " + (this.textViewRecognitionOutput.getText().toString()));
+                    prepareFileToShareImageActivity(this.recognizedBitmap, "Plate nr: " + (this.textViewRecognitionOutput.getText().toString()));
             }
         }
-
-
     }
 
 
-    private void prepareFileToShare (Bitmap bitmap,String filename) {
-
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("image/png");
-        ByteArrayOutputStream bytaArray = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytaArray);
-        File imageFile = new File(Environment.getExternalStorageDirectory() + File.separator + filename + ".png");
-        try {
-            imageFile.createNewFile();
-            FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
-            fileOutputStream.write(bytaArray.toByteArray());
-            fileOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
+    private void prepareFileToShareImageActivity (Bitmap bitmap,String filename) {
+        Intent share = this.shareExecuter.prepareFileToShare(bitmap,filename);
         startActivity(Intent.createChooser(share, "Recognizer share license plate"));
-        //SPRAWDZIC TO
-        imageFile.deleteOnExit();
-
-
-
     }
 
     public void showPolishPlateDetailedInfo(View v){
@@ -382,35 +322,5 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
                 Toast.makeText(this,polishPlateDetails,Toast.LENGTH_LONG).show();
         }
     }
+
 }
-
-  /*  public void convertToGray(View view){
-
-        Mat Rgba = new Mat();
-        Mat grayMat = new Mat();
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inDither = false;
-        o.inSampleSize = 4;
-
-        int width = imageBitmap.getWidth();
-        int height = imageBitmap.getHeight();
-
-        grayBitmap = Bitmap.createBitmap(width,height,Bitmap.Config.RGB_565);
-
-        //bitmap to MAT
-
-        Utils.bitmapToMat(imageBitmap,Rgba);
-
-        //get it gray
-
-        Imgproc.cvtColor(Rgba,grayMat,Imgproc.COLOR_RGB2GRAY);
-
-        Utils.matToBitmap(grayMat,grayBitmap);
-
-        imageView.setImageBitmap(grayBitmap);
-
-
-    }
-}*/
-
-

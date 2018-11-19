@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_orange_light"
+    android:background="@android:color/darker_gray"
     tools:context=".RecognizeOnPreRecordedVideoActivity">
 
 
@@ -94,7 +94,7 @@
         android:layout_above="@id/vview"
         android:layout_height="250dp"
         android:layout_marginBottom="12dp"
-        android:background="@android:color/holo_orange_light"/>
+        android:background="@android:color/darker_gray"/>
 
     <ImageView
         android:layout_width="180dp"

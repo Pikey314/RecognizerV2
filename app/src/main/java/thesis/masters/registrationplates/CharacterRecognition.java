@@ -19,12 +19,10 @@ public class CharacterRecognition {
     public int getTextFromImage(Bitmap bitmap, Context context, TextView textView, TextView textView2, TextView textView3, TextView textView4, int numberOfPlates){
         int flag = 0;
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
-
         if (textRecognizer.isOperational())
         {
             Frame frame = new Frame.Builder().setBitmap(bitmap).build();
             SparseArray<TextBlock> items = textRecognizer.detect(frame);
-
             if(numberOfPlates == 1){
                 if (items.size()!=0) {
                      String sb0;
@@ -36,13 +34,10 @@ public class CharacterRecognition {
                              flag = 1;
                              break;
                          }
-
                      }
                 }
-
             } else {
                 String sb, s1 = "", s2 = "", s3 = "";
-
                 for (int i = 0; i < items.size(); i++) {
                     TextBlock myItems = items.valueAt(i);
                     sb = myItems.getValue();
@@ -64,11 +59,9 @@ public class CharacterRecognition {
                             flag = 4;
                             break;
                         }
-
                     }
                 }
             }
-
         }
         else
         {
@@ -76,7 +69,6 @@ public class CharacterRecognition {
         }
         return flag;
     }
-
 
 
     public void getTextFromVideo(Mat mat, int orientation, Bitmap recognitionBitmapPortrait, Bitmap recognitionBitmapLandscape, Bitmap recognitionBitmap, TextRecognizer textRecognizer, final TextView textView){
@@ -89,16 +81,14 @@ public class CharacterRecognition {
             Utils.matToBitmap(mat, recognitionBitmapLandscape);
             recognitionBitmap = recognitionBitmapLandscape;
         }
-        if (textRecognizer.isOperational())
-        {
+        if (textRecognizer.isOperational()) {
             Frame frame = new Frame.Builder().setBitmap(recognitionBitmap).build();
             final SparseArray<TextBlock> items = textRecognizer.detect(frame);
-            if (items.size()!=0) {
+            if (items.size() != 0) {
                 textView.post(new Runnable() {
                     @Override
                     public void run() {
                         String sb;
-
                         for (int i = 0; i < items.size(); i++) {
                             TextBlock myItems = items.valueAt(i);
                             sb = myItems.getValue();
@@ -107,12 +97,10 @@ public class CharacterRecognition {
                                 break;
                             }
                         }
-
                     }
                 });
             }
         }
-
     }
 
 }

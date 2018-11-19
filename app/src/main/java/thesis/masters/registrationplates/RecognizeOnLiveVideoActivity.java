@@ -1,17 +1,12 @@
 package thesis.masters.registrationplates;
 
 import android.Manifest;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -37,27 +32,23 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
 
-    CameraBridgeViewBase cameraBridgeViewBase;
-    Mat originalImageMat, processingMat1, processingMat2, processingMat3, transposeMat, flipMat, ocrMat, processingMat4;
-    Bitmap recognitionBitmap, recognitionBitmapPortrait, recognitionBitmapLandscape, shareBitmapPortrait, shareBitmapLandscape;
-    BaseLoaderCallback baseLoaderCallback;
-    TextView textViewVideoRecognitionOutput;
-    ImageView plateImageView;
-    Switch switchOCRActive;
-    Switch switchOldPlates;
-    TextRecognizer textRecognizer;
-    CharacterRecognition characterRecognition;
+    private CameraBridgeViewBase cameraBridgeViewBase;
+    private Mat originalImageMat, processingMat1, processingMat2, processingMat3, transposeMat, flipMat, ocrMat, processingMat4;
+    private Bitmap recognitionBitmap, recognitionBitmapPortrait, recognitionBitmapLandscape, shareBitmapPortrait, shareBitmapLandscape;
+    private BaseLoaderCallback baseLoaderCallback;
+    private TextView textViewVideoRecognitionOutput;
+    private ImageView plateImageView;
+    private Switch switchOCRActive;
+    private Switch switchOldPlates;
+    private TextRecognizer textRecognizer;
+    private CharacterRecognition characterRecognition;
+    private ShareExecuter shareExecuter;
     private int orientation;
-    PlateDetector plateDetector;
-    PlateDetailsInformator plateDetailsInformator;
-    SeekBar seekBarDistanceFromPlate;
+    private PlateDetector plateDetector;
+    private PlateDetailsInformator plateDetailsInformator;
+    private SeekBar seekBarDistanceFromPlate;
     private boolean oldPlatesMode;
     private boolean ocrActive;
     private int distanceFromPlate;
@@ -127,10 +118,11 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-        characterRecognition = new CharacterRecognition();
-        textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
-        plateDetector = new PlateDetector();
-        plateDetailsInformator = new PlateDetailsInformator(this);
+        this.characterRecognition = new CharacterRecognition();
+        this.shareExecuter = new ShareExecuter();
+        this.textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
+        this.plateDetector = new PlateDetector();
+        this.plateDetailsInformator = new PlateDetailsInformator(this);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             this.recognitionMethod = extras.getString("spinnerValue");
@@ -146,12 +138,11 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         this.ocrActive = false;
         this.distanceFromPlate = 2;
         this.seekBarDistanceFromPlate.setProgress(2);
-        cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
-        cameraBridgeViewBase.setCvCameraViewListener(this);
+        this.cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
+        this.cameraBridgeViewBase.setCvCameraViewListener(this);
         this.baseLoaderCallback = new BaseLoaderCallback(this) {
             @Override
             public void onManagerConnected(int status) {
-
                 switch (status) {
                     case BaseLoaderCallback.SUCCESS:
                         if (ContextCompat.checkSelfPermission(RecognizeOnLiveVideoActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -219,7 +210,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                cameraBridgeViewBase.enableView();
+                this.cameraBridgeViewBase.enableView();
                 Toast.makeText(this, "Camera Permission granted", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Camera Permission not granted", Toast.LENGTH_SHORT).show();
@@ -234,19 +225,17 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
                 if (permissions_flag) {
                     if (this.originalImageMat != null) {
                         if (this.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                            Utils.matToBitmap(originalImageMat, shareBitmapPortrait);
+                            Utils.matToBitmap(this.originalImageMat, this.shareBitmapPortrait);
                             if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
-                                prepareFileToShareVideo(this.shareBitmapPortrait, "Recognizer_license_plate");
+                                prepareFileToShareVideoActivity(this.shareBitmapPortrait, "Recognizer_license_plate");
                             else
-                                prepareFileToShareVideo(this.shareBitmapPortrait, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
-
+                                prepareFileToShareVideoActivity(this.shareBitmapPortrait, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
                         } else {
-                            Utils.matToBitmap(originalImageMat, shareBitmapLandscape);
+                            Utils.matToBitmap(this.originalImageMat, this.shareBitmapLandscape);
                             if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
-                                prepareFileToShareVideo(this.shareBitmapLandscape, "Recognizer_license_plate");
+                                prepareFileToShareVideoActivity(this.shareBitmapLandscape, "Recognizer_license_plate");
                             else
-                                prepareFileToShareVideo(this.shareBitmapLandscape, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
-
+                                prepareFileToShareVideoActivity(this.shareBitmapLandscape, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
                         }
                     }
                     Toast.makeText(this,"Sharing permission granted",Toast.LENGTH_SHORT).show();
@@ -262,76 +251,67 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        originalImageMat = inputFrame.rgba();
-
-        ocrMat = originalImageMat;
-
+        this.originalImageMat = inputFrame.rgba();
+        this.ocrMat = this.originalImageMat;
         this.orientation = getResources().getConfiguration().orientation;
         if (this.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Core.transpose(originalImageMat, transposeMat);
-            Imgproc.resize(transposeMat, flipMat, flipMat.size(), 0, 0, 0);
-            Core.flip(flipMat, originalImageMat, 1);
+            Core.transpose(this.originalImageMat, this.transposeMat);
+            Imgproc.resize(this.transposeMat, this.flipMat, this.flipMat.size(), 0, 0, 0);
+            Core.flip(this.flipMat, this.originalImageMat, 1);
         }
         if (this.oldPlatesMode)
-            this.originalImageMat = plateDetector.morphologicalTransformationsRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.distanceFromPlate);
+            this.originalImageMat = this.plateDetector.morphologicalTransformationsRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.distanceFromPlate);
         else {
             switch (this.recognitionMethod) {
                 case "Morphological Transformations":
-                    this.originalImageMat = plateDetector.morphologicalTransformationsRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.distanceFromPlate);
+                    this.originalImageMat = this.plateDetector.morphologicalTransformationsRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.distanceFromPlate);
                     break;
                 case "Median Center of Moments":
-                    this.originalImageMat = plateDetector.medianCenterOfMomentRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.processingMat3, this.processingMat4, this.distanceFromPlate);
+                    this.originalImageMat = this.plateDetector.medianCenterOfMomentRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.processingMat3, this.processingMat4, this.distanceFromPlate);
                     break;
                 case "Vertical Edge Contouring":
-                    this.originalImageMat = plateDetector.edgeContourRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.processingMat3, this.processingMat4, this.distanceFromPlate);
+                    this.originalImageMat = this.plateDetector.edgeContourRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.processingMat3, this.processingMat4, this.distanceFromPlate);
                     break;
             }
         }
-
         //Rozpoznowanie na co 5 klatce
         if (this.ocrActive) {
             if (this.ocrDelay == 3)
-                characterRecognition.getTextFromVideo(ocrMat, orientation, recognitionBitmapPortrait, recognitionBitmapLandscape, recognitionBitmap, textRecognizer, textViewVideoRecognitionOutput);
+                this.characterRecognition.getTextFromVideo(this.ocrMat, this.orientation, this.recognitionBitmapPortrait, this.recognitionBitmapLandscape, this.recognitionBitmap, this.textRecognizer, this.textViewVideoRecognitionOutput);
             else if (this.ocrDelay == 4)
                 this.ocrDelay = 0;
             else
                 this.ocrDelay++;
         }
-
         return originalImageMat;
     }
 
-
     @Override
     public void onCameraViewStopped() {
-        originalImageMat.release();
-        processingMat1.release();
-        processingMat2.release();
-        processingMat3.release();
-        processingMat4.release();
-        transposeMat.release();
-        flipMat.release();
-        ocrMat.release();
-
-
+        this.originalImageMat.release();
+        this.processingMat1.release();
+        this.processingMat2.release();
+        this.processingMat3.release();
+        this.processingMat4.release();
+        this.transposeMat.release();
+        this.flipMat.release();
+        this.ocrMat.release();
     }
 
     @Override
     public void onCameraViewStarted(int width, int height) {
-        originalImageMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
-        processingMat1 = new Mat(width, height, CvType.CV_8U, new Scalar(4));
-        processingMat2 = new Mat(width, height, CvType.CV_8U, new Scalar(4));
-        processingMat3 = new Mat(width, height, CvType.CV_8U, new Scalar(4));
-        processingMat4 = new Mat(width, height, CvType.CV_8U, new Scalar(4));
-        transposeMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
-        flipMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
-        ocrMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
-        recognitionBitmapPortrait = Bitmap.createBitmap(originalImageMat.cols(), originalImageMat.rows(), Bitmap.Config.ARGB_8888);
-        recognitionBitmapLandscape = Bitmap.createBitmap(originalImageMat.rows(), originalImageMat.cols(), Bitmap.Config.ARGB_8888);
-        shareBitmapPortrait = Bitmap.createBitmap(originalImageMat.cols(), originalImageMat.rows(), Bitmap.Config.ARGB_8888);
-        shareBitmapLandscape = Bitmap.createBitmap(originalImageMat.rows(), originalImageMat.cols(), Bitmap.Config.ARGB_8888);
-
-
+        this.originalImageMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
+        this.processingMat1 = new Mat(width, height, CvType.CV_8U, new Scalar(4));
+        this.processingMat2 = new Mat(width, height, CvType.CV_8U, new Scalar(4));
+        this.processingMat3 = new Mat(width, height, CvType.CV_8U, new Scalar(4));
+        this.processingMat4 = new Mat(width, height, CvType.CV_8U, new Scalar(4));
+        this.transposeMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
+        this.flipMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
+        this.ocrMat = new Mat(width, height, CvType.CV_8U, new Scalar(4));
+        this.recognitionBitmapPortrait = Bitmap.createBitmap(this.originalImageMat.cols(), this.originalImageMat.rows(), Bitmap.Config.ARGB_8888);
+        this.recognitionBitmapLandscape = Bitmap.createBitmap(this.originalImageMat.rows(), this.originalImageMat.cols(), Bitmap.Config.ARGB_8888);
+        this.shareBitmapPortrait = Bitmap.createBitmap(this.originalImageMat.cols(), this.originalImageMat.rows(), Bitmap.Config.ARGB_8888);
+        this.shareBitmapLandscape = Bitmap.createBitmap(this.originalImageMat.rows(), this.originalImageMat.cols(), Bitmap.Config.ARGB_8888);
     }
 
     @Override
@@ -339,23 +319,21 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         super.onPause();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
         if (!OpenCVLoader.initDebug()) {
             Toast.makeText(getApplicationContext(), "OpenCV problem", Toast.LENGTH_SHORT).show();
         } else {
-            baseLoaderCallback.onManagerConnected(BaseLoaderCallback.SUCCESS);
+            this.baseLoaderCallback.onManagerConnected(BaseLoaderCallback.SUCCESS);
         }
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (cameraBridgeViewBase != null) {
-            cameraBridgeViewBase.disableView();
+        if (this.cameraBridgeViewBase != null) {
+            this.cameraBridgeViewBase.disableView();
         }
     }
 
@@ -366,56 +344,34 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
         } else {
             if (this.originalImageMat != null) {
                 if (this.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    Utils.matToBitmap(originalImageMat, shareBitmapPortrait);
+                    Utils.matToBitmap(this.originalImageMat, this.shareBitmapPortrait);
                     if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
-                        prepareFileToShareVideo(this.shareBitmapPortrait, "Recognizer_license_plate");
+                        prepareFileToShareVideoActivity(this.shareBitmapPortrait, "Recognizer_license_plate");
                     else
-                        prepareFileToShareVideo(this.shareBitmapPortrait, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
-
+                        prepareFileToShareVideoActivity(this.shareBitmapPortrait, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
                 } else {
-                    Utils.matToBitmap(originalImageMat, shareBitmapLandscape);
+                    Utils.matToBitmap(this.originalImageMat, this.shareBitmapLandscape);
                     if ((this.textViewVideoRecognitionOutput.getText().toString()).equals(""))
-                        prepareFileToShareVideo(this.shareBitmapLandscape, "Recognizer_license_plate");
+                        prepareFileToShareVideoActivity(this.shareBitmapLandscape, "Recognizer_license_plate");
                     else
-                        prepareFileToShareVideo(this.shareBitmapLandscape, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
-
+                        prepareFileToShareVideoActivity(this.shareBitmapLandscape, "Plate nr: " + (this.textViewVideoRecognitionOutput.getText().toString()));
                 }
             }
         }
-
-
     }
 
-
-    private void prepareFileToShareVideo (Bitmap bitmap,String filename) {
-
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("image/png");
-        ByteArrayOutputStream bytaArray = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, bytaArray);
-        File imageFile = new File(Environment.getExternalStorageDirectory() + File.separator + filename + ".png");
-        try {
-            imageFile.createNewFile();
-            FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
-            fileOutputStream.write(bytaArray.toByteArray());
-            fileOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(imageFile));
+    private void prepareFileToShareVideoActivity (Bitmap bitmap,String filename) {
+        Intent share = this.shareExecuter.prepareFileToShare(bitmap,filename);
         startActivity(Intent.createChooser(share, "Recognizer share license plate"));
-        //SPRAWDZIC TO
-        imageFile.deleteOnExit();
-
-
 
     }
 
     public void showPolishPlateDetailedInfoVideo(View v){
         if(this.textViewVideoRecognitionOutput.getText().toString()!=null && !this.textViewVideoRecognitionOutput.getText().toString().equals("")){
-            String polishPlateDetails = plateDetailsInformator.getPolishPlateDetailedInfo(this.textViewVideoRecognitionOutput.getText().toString());
+            String polishPlateDetails = this.plateDetailsInformator.getPolishPlateDetailedInfo(this.textViewVideoRecognitionOutput.getText().toString());
             if (!polishPlateDetails.equals(""))
                 Toast.makeText(this,polishPlateDetails,Toast.LENGTH_LONG).show();
         }
     }
+
 }

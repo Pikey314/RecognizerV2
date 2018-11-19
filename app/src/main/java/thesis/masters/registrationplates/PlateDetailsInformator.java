@@ -1,9 +1,6 @@
 package thesis.masters.registrationplates;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-
-import java.io.File;
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -18,20 +15,17 @@ public class PlateDetailsInformator {
         String stringToReturn = "";
         String wojewodztwoFromPlate = plate.substring(0,1);
         boolean recognizedWojewodztwo = false;
-        boolean recognizedSluzba = false;
         String powiatFromPlate3 = plate.substring(0,3);
         boolean recognizedpowiatFromPlate3 = false;
         String powiatFromPlate2 = plate.substring(0,2);
         String warsawEndFromPlate1 = plate.substring(plate.length()-1);
         String warsawEndFromPlate2 = plate.substring(plate.length()-2);
-        boolean recognizedpowiatFromPlate2 = false;
         String[] wojewodztwoFromFile;
         String[] powiatFromFile;
         String[] sluzbyFromFile;
         String[] warsawFromFile;
         boolean endOnFirstStep = false;
 
-//POZAMYKAJ SKANERY I input streamy
         if(wojewodztwoFromPlate.equals("H")) {
             InputStream inputStreamSluzby = this.context.getResources().openRawResource(R.raw.sluzby);
             Scanner scSluzby = new Scanner(inputStreamSluzby);
@@ -57,8 +51,6 @@ public class PlateDetailsInformator {
             }
             scWarsawNormal.close();
         }
-
-
         if (!endOnFirstStep) {
             if (powiatFromPlate2.equals("WW")) {
                 if (warsawEndFromPlate2.equals("EL")) {
@@ -87,10 +79,7 @@ public class PlateDetailsInformator {
                 else
                     stringToReturn = "Województwo: mazowieckie\nMiasto: Warszawa\nDzielnica: Wola";
             } else {
-
-
                 InputStream inputStream = this.context.getResources().openRawResource(R.raw.wojewodztwa);
-
                 Scanner sc = new Scanner(inputStream);
                 while (sc.hasNextLine()) {
                     wojewodztwoFromFile = sc.nextLine().split(":");
@@ -101,9 +90,7 @@ public class PlateDetailsInformator {
                     }
                 }
                 sc.close();
-
                 if (recognizedWojewodztwo) {
-
                     InputStream inputStream1 = this.context.getResources().openRawResource(R.raw.powiaty);
                     Scanner sc1 = new Scanner(inputStream1);
                     while (sc1.hasNextLine()) {
@@ -123,23 +110,15 @@ public class PlateDetailsInformator {
                             powiatFromFile = sc2.nextLine().split(":");
                             if (powiatFromPlate2.equals(powiatFromFile[0])) {
                                 stringToReturn = "\nPowiat: " + powiatFromFile[1];
-                                recognizedpowiatFromPlate2 = true;
                                 break;
                             }
                         }
                         sc2.close();
                     }
-
-
                 }
             }
         }
-
-
-
-
         return stringToReturn;
-
-
     }
+
 }
