@@ -96,7 +96,6 @@ public class PlateDetector {
                 break;
 
         }
-
         //TUTAJ distance from plate zmienic (3 dla małego, 9 dla średniego itp)
         Imgproc.dilate(grayScaleMat, tmp, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(dilateErodeKernel, dilateErodeKernel)));
         Imgproc.erode(tmp, dilateErodeMat, Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(dilateErodeKernel, dilateErodeKernel)));
@@ -194,8 +193,6 @@ public class PlateDetector {
                 break;
 
         }
-
-
         int kernelSize = h / 5;
         Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(kernelSize, kernelSize));
         Imgproc.morphologyEx(processingMat, processingMat, Imgproc.MORPH_TOPHAT, kernel);
@@ -378,6 +375,11 @@ public class PlateDetector {
         Utils.matToBitmap(matToReturn, bitmapToReturn);
         return bitmapToReturn;
     }
+
+
+
+
+
 
 
     //METHODS FOR VIDEO RECOGNITION START

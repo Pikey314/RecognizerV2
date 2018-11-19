@@ -1,0 +1,16 @@
+B:Podlaskie
+C:Kujawsko—Pomorskie
+D:Dolnoślaskie
+E:Łódzkie
+F:Lubuskie
+G:Pomorskie
+K:Małopolskie
+L:Lubelskie
+N:Warmińsko—Mazurskie
+O:Opolskie
+P:Wielkopolskie
+R:Podkarpackie
+S:Sląskie
+T:Swiętokrzyskie
+W:Mazowieckie
+Z:Zachodniopomorskie

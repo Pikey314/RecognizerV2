@@ -1,0 +1,8 @@
+HB:wojska MSWiA
+HB:Biuro Ochrony Rządu
+HC:Izba Celna
+HK:Agencja Bezpieczeństwa Wewnętrznego i Agencja Wywiadu
+HM:Służba Wywiadu Wojskowego i Służba Kontrwywiadu Wojskowego
+HP:Policja
+HS:Kontrola Skarbowa
+HW:Straż Graniczna

@@ -62,7 +62,9 @@ public class SelectSourceForRecognitionActivity extends AppCompatActivity {
             intent.putExtra("spinnerValue", spinnerValueString);
             startActivity(intent);
         } else if (liveOrGallerySelectionText.equals("GALLERY") && videoOrPhotoSelectionText.equals("VIDEO")) {
-            Toast.makeText(this,"Gallery video recognition disabled in the current version of application",Toast.LENGTH_LONG).show();
+            intent = new Intent(this, RecognizeOnPreRecordedVideoActivity.class);
+            intent.putExtra("spinnerValue", spinnerValueString);
+            startActivity(intent);
         } else {
             intent = new Intent(this, ConfirmRecognitionSelectionActivity.class);
             intent.putExtra("spinnerValue", spinnerValueString);

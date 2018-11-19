@@ -20,8 +20,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SelectSourceForRecognitionActivity"/>
-        <activity android:name=".ConfirmRecognitionSelectionActivity"/>
+        <activity android:name=".SelectSourceForRecognitionActivity" />
+        <activity android:name=".ConfirmRecognitionSelectionActivity" />
         <activity android:name=".RecognizeOnLiveVideoActivity" />
         <activity android:name=".RecognizeOnImageActivity" />
 
@@ -29,9 +29,10 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name=".RecognizeOnPreRecordedVideoActivity"
-            android:screenOrientation="portrait">
-        </activity>
+        <activity
+            android:name=".RecognizeOnPreRecordedVideoActivity"
+            android:screenOrientation="portrait"></activity>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="thesis.masters.registrationplates"
@@ -39,7 +40,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
 
     </application>

@@ -1,0 +1,12 @@
+WA:Białołęka
+WB:Bemowo
+WD:Bielany
+WE:Mokotów
+WF:Praga Południe
+WH:Praga Północ
+WI:Śródmieście
+WJ:Targówek
+WK:Ursus
+WN:Ursynów
+WT:Wawer
+WU:Ochota
