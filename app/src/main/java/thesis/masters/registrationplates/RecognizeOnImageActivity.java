@@ -267,7 +267,7 @@ public class RecognizeOnImageActivity extends AppCompatActivity {
         }
     }
 
-    public void recognizeTestMethod1(View view) {
+    public void recognizeOnButtonClick(View view) {
         if (this.imageBitmap != null)
         {
             if (this.oldPlatesMode || this.numberOfPlates > 1)

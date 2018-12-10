@@ -110,7 +110,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:background="@drawable/recognizebutton"
-        android:onClick="recognizeTestMethod1"
+        android:onClick="recognizeOnButtonClick"
         android:layout_marginBottom="5dp"
         android:layout_marginRight="5dp"
         android:visibility="invisible"/>

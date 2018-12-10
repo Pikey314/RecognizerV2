@@ -259,6 +259,15 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
             Imgproc.resize(this.transposeMat, this.flipMat, this.flipMat.size(), 0, 0, 0);
             Core.flip(this.flipMat, this.originalImageMat, 1);
         }
+        //Rozpoznowanie na co 5 klatce
+        if (this.ocrActive) {
+            if (this.ocrDelay == 3)
+                this.characterRecognition.getTextFromVideo(this.ocrMat, this.orientation, this.recognitionBitmapPortrait, this.recognitionBitmapLandscape, this.recognitionBitmap, this.textRecognizer, this.textViewVideoRecognitionOutput);
+            else if (this.ocrDelay == 4)
+                this.ocrDelay = 0;
+            else
+                this.ocrDelay++;
+        }
         if (this.oldPlatesMode)
             this.originalImageMat = this.plateDetector.morphologicalTransformationsRecognitionMethodForVideo(this.originalImageMat, this.processingMat1, this.processingMat2, this.distanceFromPlate);
         else {
@@ -274,15 +283,7 @@ public class RecognizeOnLiveVideoActivity extends AppCompatActivity implements C
                     break;
             }
         }
-        //Rozpoznowanie na co 5 klatce
-        if (this.ocrActive) {
-            if (this.ocrDelay == 3)
-                this.characterRecognition.getTextFromVideo(this.ocrMat, this.orientation, this.recognitionBitmapPortrait, this.recognitionBitmapLandscape, this.recognitionBitmap, this.textRecognizer, this.textViewVideoRecognitionOutput);
-            else if (this.ocrDelay == 4)
-                this.ocrDelay = 0;
-            else
-                this.ocrDelay++;
-        }
+
         return originalImageMat;
     }
 
